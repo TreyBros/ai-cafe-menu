@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -251,7 +251,7 @@ const CoffeeCard: React.FC<CoffeeCardProps> = ({ coffee, isSelected, onToggle, d
             )}
           </div>
           <div className="flex-1">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between">
               <h3 className="font-medium text-vsp-darkgray dark:text-white">{coffee.name}</h3>
               <span className="text-sm font-medium text-vsp-blue dark:text-blue-light">{coffee.price}</span>
             </div>
@@ -439,11 +439,17 @@ const EnhancedMenuDisplay: React.FC<EnhancedMenuDisplayProps> = ({
     item.featured || (item.badges && item.badges.includes('Popular'))
   );
   
-  // Get courses (items categorized as course)
-  const courseItems = menuItems.filter(item => item.category === 'course');
+  // Get courses (items with course-related content)
+  const courseItems = menuItems.filter(item => 
+    item.category === 'appetizer' || // Using categories from MenuItem type
+    (item.badges && item.badges.includes('Course'))
+  );
   
-  // Get workshops (items categorized as workshop)
-  const workshopItems = menuItems.filter(item => item.category === 'workshop');
+  // Get workshops (items with workshop-related content)
+  const workshopItems = menuItems.filter(item => 
+    item.category === 'entree' ||    // Using categories from MenuItem type
+    (item.badges && item.badges.includes('Workshop'))
+  );
   
   const isCoffeeSelected = (id: string) => session.selectedCoffees.some(coffee => coffee.id === id);
   
@@ -479,11 +485,10 @@ const EnhancedMenuDisplay: React.FC<EnhancedMenuDisplayProps> = ({
     // Navigate to lesson page
     setIsPreviewOpen(false);
     
-    if (menuItem.proceedToLesson) {
-      setTimeout(() => {
-        navigate('/lesson-page');
-      }, 500);
-    }
+    // Navigate to lesson page directly without checking proceedToLesson
+    setTimeout(() => {
+      navigate('/lesson-page');
+    }, 500);
   };
   
   return (
@@ -638,4 +643,4 @@ const EnhancedMenuDisplay: React.FC<EnhancedMenuDisplayProps> = ({
   );
 };
 
-export default EnhancedMenuDisplay; 
+export default EnhancedMenuDisplay;

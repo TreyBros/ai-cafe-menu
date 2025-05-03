@@ -1,3 +1,4 @@
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
@@ -21,8 +22,8 @@ interface OrderItem {
   id: string;
   menuItemId: string;
   coffeeItemId?: string;
-  completed: boolean;
   timestamp: string;
+  completed: boolean;
   notes?: string;
 }
 
@@ -195,11 +196,15 @@ export const useSessionStore = create<SessionStore>()(
         const completedItems = session.completedItems || [];
         const selectedCoffees = session.selectedCoffees || [];
         const skillsAcquired = session.skillsAcquired || [];
+        const userNotes = session.userNotes || [];
         
         // Calculate learning stats
         const categoriesCompleted = [
           ...new Set((completedItems || []).map(item => item.category))
-        ];
+        ].length;
+        
+        // Time spent calculation
+        const timeSpentMinutes = session.totalTimeSpent || 0;
         
         // Calculate order total
         const orderTotal = [
@@ -218,15 +223,16 @@ export const useSessionStore = create<SessionStore>()(
           items: completedItems,
           coffees: selectedCoffees,
           completedOrders: session.completedOrders || [],
-          notes: session.userNotes || [],
+          notes: userNotes,
           skills: [...new Set(skillsAcquired)],
           stats: {
-            timeSpentMinutes: session.totalTimeSpent || 0,
-            categoriesCompleted: categoriesCompleted.length,
-            categoriesList: categoriesCompleted,
+            timeSpentMinutes,
+            categoriesCompleted,
+            categoriesList: [...new Set((completedItems || []).map(item => item.category))],
             totalItems: completedItems.length,
             totalCoffees: selectedCoffees.length
           },
+          totalAmount: orderTotal.toFixed(2),
           pricing: {
             subtotal: orderTotal.toFixed(2),
             tax: (orderTotal * 0.08).toFixed(2),

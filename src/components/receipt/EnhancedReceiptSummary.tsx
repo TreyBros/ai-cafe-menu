@@ -255,15 +255,15 @@ const EnhancedReceiptSummary: React.FC = () => {
                     </Badge>
                   </div>
                   
-                  {session.completedItems.length > 0 ? (
+                  {session.completedItems && session.completedItems.length > 0 ? (
                     <div className="space-y-3">
-                      {session.completedItems.map((itemId, index) => {
-                        const menuItem = getItemDetails(itemId);
+                      {session.completedItems.map((item, index) => {
+                        const menuItem = getItemDetails(item.id);
                         if (!menuItem) return null;
                         
                         return (
                           <motion.div 
-                            key={itemId}
+                            key={`item-${index}`}
                             custom={index}
                             variants={listItemVariants}
                             initial="hidden"
@@ -390,11 +390,11 @@ const EnhancedReceiptSummary: React.FC = () => {
                   Current Order
                 </h3>
                 
-                {session.currentOrder.length > 0 ? (
+                {session.currentOrder && session.currentOrder.length > 0 ? (
                   <div className="space-y-4">
                     {session.currentOrder.map((order, index) => {
                       const menuItem = getItemDetails(order.menuItemId);
-                      const coffeeItem = order.coffeeId ? getCoffeeDetails(order.coffeeId) : null;
+                      const coffeeItem = order.coffeeItemId ? getCoffeeDetails(order.coffeeItemId) : null;
                       
                       if (!menuItem) return null;
                       
@@ -480,7 +480,7 @@ const EnhancedReceiptSummary: React.FC = () => {
                 )}
               </div>
               
-              {session.completedOrders.length > 0 && (
+              {session.completedOrders && session.completedOrders.length > 0 && (
                 <div className="vsp-premium-card p-6">
                   <h3 className="font-cafe font-semibold text-lg mb-4 text-vsp-darkgray dark:text-white flex items-center">
                     <CheckCheck className="mr-2 text-vsp-blue" size={20} />
@@ -488,42 +488,40 @@ const EnhancedReceiptSummary: React.FC = () => {
                   </h3>
                   
                   <div className="space-y-4">
-                    {session.completedOrders.map((completedOrder, orderIndex) => (
-                      <div 
-                        key={orderIndex}
-                        className="border border-vsp-blue/10 rounded-lg overflow-hidden"
-                      >
-                        <div className="bg-vsp-blue/5 px-4 py-2 flex justify-between items-center">
-                          <div className="font-medium text-vsp-darkgray dark:text-white">
-                            Order #{orderIndex + 1}
+                    {session.completedOrders.map((completedOrder, orderIndex) => {
+                      // Use timestamp as date if the date property is missing
+                      const orderDate = completedOrder.timestamp || new Date().toISOString();
+                      
+                      return (
+                        <div 
+                          key={orderIndex}
+                          className="border border-vsp-blue/10 rounded-lg overflow-hidden"
+                        >
+                          <div className="bg-vsp-blue/5 px-4 py-2 flex justify-between items-center">
+                            <div className="font-medium text-vsp-darkgray dark:text-white">
+                              Order #{orderIndex + 1}
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                              {formatDate(orderDate)}
+                            </div>
                           </div>
-                          <div className="text-sm text-muted-foreground">
-                            {formatDate(completedOrder.date)}
-                          </div>
-                        </div>
-                        
-                        <div className="p-4 space-y-3">
-                          {completedOrder.items.map((order, itemIndex) => {
-                            const menuItem = getItemDetails(order.menuItemId);
-                            if (!menuItem) return null;
-                            
-                            return (
-                              <div 
-                                key={itemIndex}
-                                className="flex justify-between items-center p-3 bg-card rounded-lg"
-                              >
-                                <div className="font-medium text-vsp-darkgray dark:text-white">
-                                  {menuItem.title}
-                                </div>
-                                <div className="font-medium text-vsp-blue">
-                                  {formatCurrency(menuItem.price)}
-                                </div>
+                          
+                          <div className="p-4 space-y-3">
+                            {/* Display a single menu item if "items" is missing */}
+                            <div 
+                              className="flex justify-between items-center p-3 bg-card rounded-lg"
+                            >
+                              <div className="font-medium text-vsp-darkgray dark:text-white">
+                                {getItemDetails(completedOrder.menuItemId)?.title || 'Unknown Item'}
                               </div>
-                            );
-                          })}
+                              <div className="font-medium text-vsp-blue">
+                                {formatCurrency(getItemDetails(completedOrder.menuItemId)?.price || "0.00")}
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -544,7 +542,7 @@ const EnhancedReceiptSummary: React.FC = () => {
                   </Badge>
                 </div>
                 
-                {session.completedItems.length > 0 ? (
+                {session.completedItems && session.completedItems.length > 0 ? (
                   <div className="space-y-6">
                     <Table>
                       <TableHeader>
@@ -555,12 +553,12 @@ const EnhancedReceiptSummary: React.FC = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {session.completedItems.flatMap((itemId, index) => {
-                          const menuItem = getItemDetails(itemId);
+                        {session.completedItems.flatMap((item, index) => {
+                          const menuItem = getItemDetails(item.id);
                           if (!menuItem) return [];
                           
                           return menuItem.highlights.map((skill, skillIndex) => (
-                            <TableRow key={`${itemId}-${skillIndex}`}>
+                            <TableRow key={`${item.id}-${skillIndex}`}>
                               <TableCell className="font-medium">{skill}</TableCell>
                               <TableCell>{menuItem.title}</TableCell>
                               <TableCell className="text-right">
@@ -579,9 +577,9 @@ const EnhancedReceiptSummary: React.FC = () => {
                     
                     <div>
                       <h4 className="font-medium text-vsp-darkgray dark:text-white mb-2">Learning Notes</h4>
-                      {session.notes.length > 0 ? (
+                      {session.userNotes && session.userNotes.length > 0 ? (
                         <div className="space-y-3">
-                          {session.notes.map((note, index) => (
+                          {session.userNotes.map((note, index) => (
                             <div key={index} className="p-3 bg-card rounded-lg border border-vsp-blue/10">
                               <div className="text-sm text-muted-foreground italic">"{note}"</div>
                             </div>
@@ -642,4 +640,4 @@ const EnhancedReceiptSummary: React.FC = () => {
   );
 };
 
-export default EnhancedReceiptSummary; 
+export default EnhancedReceiptSummary;

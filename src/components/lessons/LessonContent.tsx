@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { ArrowLeft, Check, Coffee, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -22,7 +23,9 @@ const LessonContent: React.FC<LessonContentProps> = ({ lesson }) => {
     addCompletedItem({
       id: lesson.id,
       title: lesson.title,
-      category: lesson.category
+      category: lesson.category,
+      price: lesson.price,  // Add the required price property
+      image: lesson.image   // Add the image property for consistency
     });
     
     toast({
@@ -80,7 +83,9 @@ const LessonContent: React.FC<LessonContentProps> = ({ lesson }) => {
               <h3 className="text-xl font-cafe font-semibold mb-4">Interactive Experience</h3>
               <div className="bg-muted p-6 rounded-lg text-center">
                 <p className="text-muted-foreground mb-3">
-                  {lesson.content.interactiveElement}
+                  {typeof lesson.content.interactiveElement === 'string' 
+                    ? lesson.content.interactiveElement 
+                    : lesson.content.interactiveElement.description}
                 </p>
                 <Button variant="outline" disabled>Coming Soon</Button>
               </div>
