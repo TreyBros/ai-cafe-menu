@@ -105,20 +105,29 @@
   }
 }
 
+/* Base Components */
 .menu-card {
-  @apply bg-card rounded-lg shadow-premium hover:shadow-premium-hover transition-all duration-300;
+  @apply bg-card rounded-lg shadow-vsp-card hover:shadow-vsp-card-hover transition-all duration-300;
 }
 
 .premium-card {
-  @apply bg-white rounded-lg border border-vsp-lightgray/20 shadow-premium hover:shadow-premium-hover transition-all duration-300;
+  @apply bg-white rounded-lg border border-vsp-lightgray/20 shadow-vsp-card hover:shadow-vsp-card-hover transition-all duration-300;
 }
 
 .premium-button {
-  @apply bg-premium-gradient text-white font-medium rounded-md px-4 py-2 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105;
+  @apply bg-premium-gradient text-white font-medium rounded-md px-4 py-2 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1;
+}
+
+.premium-button-gold {
+  @apply bg-premium-gold-gradient text-vsp-darkgray font-medium rounded-md px-4 py-2 shadow-premium-gold hover:shadow-lg transition-all duration-300 hover:-translate-y-1;
 }
 
 .vsp-gradient-text {
   @apply text-transparent bg-clip-text bg-premium-gradient;
+}
+
+.gold-gradient-text {
+  @apply text-transparent bg-clip-text bg-premium-gold-gradient;
 }
 
 .gold-accent {
@@ -126,9 +135,34 @@
 }
 
 .steam {
-  @apply absolute -top-4 w-6 h-6 rounded-full bg-white/30 animate-steam;
+  position: absolute;
+  height: 10px;
+  width: 3px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 10px;
+  animation: steam 3s infinite ease-out;
 }
 
+@keyframes steam {
+  0% {
+    transform: translateY(0) scaleX(1);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-10px) scaleX(1.5);
+  }
+  95% {
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(-20px) scaleX(2);
+  }
+}
+
+/* Premium Effects */
 .shimmer-effect {
   @apply relative overflow-hidden;
 }
@@ -138,13 +172,16 @@
   @apply absolute top-0 left-0 w-full h-full bg-shimmer-gradient animate-shimmer;
 }
 
-/* Premium animations */
 .hover-lift {
-  @apply transition-transform duration-300 hover:translate-y-[-5px];
+  @apply transition-transform duration-300 hover:-translate-y-1.5;
 }
 
 .premium-glow {
   @apply animate-pulse-premium;
+}
+
+.gold-glow {
+  @apply animate-pulse-gold;
 }
 
 .premium-card-header {
@@ -156,6 +193,15 @@
   @apply absolute top-0 left-0 w-full h-1 bg-gold-gradient;
 }
 
+.premium-card-header-blue {
+  @apply relative overflow-hidden rounded-t-lg;
+}
+
+.premium-card-header-blue::before {
+  content: '';
+  @apply absolute top-0 left-0 w-full h-1 bg-premium-gradient;
+}
+
 /* Premium section styles */
 .premium-section {
   @apply relative overflow-hidden rounded-xl p-8 bg-premium-gradient text-white;
@@ -164,6 +210,34 @@
 .premium-section::before {
   content: '';
   @apply absolute top-2 right-2 bottom-2 left-2 border border-white/10 rounded-lg pointer-events-none;
+}
+
+.premium-section-gold {
+  @apply relative overflow-hidden rounded-xl p-8 bg-premium-gold-gradient text-vsp-darkgray;
+}
+
+.premium-section-gold::before {
+  content: '';
+  @apply absolute top-2 right-2 bottom-2 left-2 border border-black/5 rounded-lg pointer-events-none;
+}
+
+/* Premium Card Styles */
+.vsp-premium-card {
+  @apply relative bg-white rounded-lg overflow-hidden shadow-vsp-card border border-vsp-blue/10 hover:shadow-premium-blue transition-all duration-300;
+}
+
+.vsp-premium-card-gold {
+  @apply relative bg-premium-card-gradient rounded-lg overflow-hidden shadow-premium-gold border border-vsp-premium/10 hover:shadow-premium-gold transition-all duration-300;
+}
+
+.vsp-premium-card::before {
+  content: '';
+  @apply absolute top-0 left-0 right-0 h-1 bg-premium-blue-gradient;
+}
+
+.vsp-premium-card-gold::before {
+  content: '';
+  @apply absolute top-0 left-0 right-0 h-1 bg-premium-gold-gradient;
 }
 
 /* VSP-style navigation */
@@ -186,4 +260,138 @@
 
 .vsp-nav-item.active::after {
   @apply scale-x-100;
+}
+
+/* Premium Animations */
+.float-animation {
+  @apply animate-float;
+}
+
+.rotate-slow-animation {
+  @apply animate-rotate-slow;
+}
+
+/* Premium Decorative Elements */
+.premium-divider {
+  @apply relative flex items-center py-4;
+}
+
+.premium-divider::before, .premium-divider::after {
+  content: '';
+  @apply flex-grow h-px bg-vsp-blue/10;
+}
+
+.premium-divider::before {
+  @apply mr-4;
+}
+
+.premium-divider::after {
+  @apply ml-4;
+}
+
+.premium-divider-gold {
+  @apply relative flex items-center py-4;
+}
+
+.premium-divider-gold::before, .premium-divider-gold::after {
+  content: '';
+  @apply flex-grow h-px bg-vsp-premium/20;
+}
+
+.premium-divider-gold::before {
+  @apply mr-4;
+}
+
+.premium-divider-gold::after {
+  @apply ml-4;
+}
+
+/* Hero Section Elements */
+.hero-pattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.05' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.2;
+}
+
+.hero-glow {
+  position: absolute;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
+  border-radius: 50%;
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.badge-premium {
+  @apply bg-gradient-to-r from-amber-500 to-amber-600 text-white border-0 py-1 px-3;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+}
+
+.badge-premium-gold {
+  @apply bg-vsp-premium/10 text-vsp-premium text-xs uppercase tracking-widest font-medium px-3 py-1 rounded-full border border-vsp-premium/20;
+}
+
+/* Background gradients */
+.bg-hero-gradient {
+  background: linear-gradient(135deg, #0039a6 0%, #0050e6 100%);
+}
+
+/* Tablet-specific utility classes */
+.font-cafe {
+  font-family: 'Poppins', system-ui, sans-serif;
+}
+
+.text-blue-dark {
+  color: #0039a6;
+}
+
+.text-blue-pale {
+  color: #b3c6ff;
+}
+
+.text-highlights-blue {
+  color: #3f83f8;
+}
+
+.bg-blue-dark {
+  background-color: #0039a6;
+}
+
+.bg-blue-darker {
+  background-color: #002c80;
+}
+
+.bg-blue-pale {
+  background-color: #e6edff;
+}
+
+.hover\:bg-blue-darker:hover {
+  background-color: #002c80;
+}
+
+/* Transitions for the tablet flow */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 400ms, transform 400ms;
+}
+
+.page-transition-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 300ms, transform 300ms;
 }

@@ -18,7 +18,12 @@ import {
   Medal,
   CheckCircle,
   Eye,
-  Star
+  Star,
+  GraduationCap,
+  Globe,
+  Lightbulb,
+  BadgeCheck,
+  MessageSquareQuote
 } from 'lucide-react';
 import { useSessionStore } from '@/stores/sessionStore';
 import { Badge } from '@/components/ui/badge';
@@ -54,10 +59,42 @@ const glowVariants = {
   }
 };
 
+const featureCardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({ 
+    opacity: 1, 
+    y: 0, 
+    transition: { 
+      delay: i * 0.1 + 0.3,
+      duration: 0.5,
+      ease: "easeOut"
+    } 
+  })
+};
+
+const testimonials = [
+  {
+    quote: "VSP AI Café transformed how I learn about artificial intelligence. The structured approach and high-quality content exceeded my expectations.",
+    author: "Michael Chen",
+    title: "Software Engineer"
+  },
+  {
+    quote: "The premium experience offered here is unmatched. Each learning module is thoughtfully crafted and the attention to detail is remarkable.",
+    author: "Sophia Williams",
+    title: "Data Scientist"
+  },
+  {
+    quote: "I've tried many AI learning platforms, but this one stands out for its elegant interface and comprehensive curriculum.",
+    author: "David Rodriguez",
+    title: "Product Manager"
+  }
+];
+
 const Index = () => {
   const [showReceipt, setShowReceipt] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [userName, setUserName] = useState('');
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
   
   const { session, setUserName: storeSetUserName, addCoffeeToSelection } = useSessionStore();
   const hasCompletedItems = session.completedItems.length > 0;
@@ -88,6 +125,15 @@ const Index = () => {
     }
   }, [session.selectedCoffees.length, addCoffeeToSelection]);
   
+  // Rotate testimonials
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveTestimonial((prev) => (prev + 1) % testimonials.length);
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, []);
+  
   const handleSetUserName = () => {
     if (userName.trim()) {
       storeSetUserName(userName);
@@ -98,49 +144,46 @@ const Index = () => {
     <Layout>
       {/* Hero section */}
       <motion.section 
-        className="mb-12 py-16 px-6 bg-premium-gradient rounded-xl text-center relative overflow-hidden"
+        className="mb-12 py-20 px-6 bg-hero-gradient rounded-xl text-center relative overflow-hidden"
         variants={heroVariants}
         initial="hidden"
         animate="visible"
       >
-        <div className="absolute inset-0 z-0 opacity-20">
-          <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-white to-transparent"></div>
-          <div className="grid grid-cols-5 h-full">
-            {Array.from({ length: 25 }).map((_, i) => (
-              <div 
-                key={i} 
-                className="border border-white/20"
-              ></div>
-            ))}
-          </div>
-        </div>
+        <div className="hero-pattern"></div>
         
         {/* Decorative elements */}
+        <div className="hero-glow w-96 h-96 top-1/4 right-1/4"></div>
+        <div className="hero-glow w-64 h-64 bottom-0 left-1/4"></div>
+        
+        {/* Floating circles */}
         <motion.div 
-          className="absolute top-10 right-10 w-32 h-32 rounded-full"
+          className="absolute top-20 right-1/4 w-24 h-24 rounded-full bg-white/5 backdrop-blur-sm border border-white/10"
           animate={{
-            boxShadow: ['0 0 20px 5px rgba(255, 255, 255, 0.1)', '0 0 40px 10px rgba(255, 255, 255, 0.2)', '0 0 20px 5px rgba(255, 255, 255, 0.1)'],
+            y: [0, -15, 0],
+            rotate: [0, 5, 0]
           }}
-          transition={{ duration: 3, repeat: Infinity }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
         />
+        
         <motion.div 
-          className="absolute bottom-10 left-10 w-24 h-24 rounded-full"
+          className="absolute bottom-20 left-1/4 w-20 h-20 rounded-full bg-white/5 backdrop-blur-sm border border-white/10"
           animate={{
-            boxShadow: ['0 0 20px 5px rgba(255, 255, 255, 0.1)', '0 0 40px 10px rgba(255, 255, 255, 0.2)', '0 0 20px 5px rgba(255, 255, 255, 0.1)'],
+            y: [0, 15, 0],
+            rotate: [0, -5, 0]
           }}
-          transition={{ duration: 4, delay: 1, repeat: Infinity }}
+          transition={{ duration: 7, delay: 1, repeat: Infinity, ease: "easeInOut" }}
         />
         
         <div className="relative z-10 max-w-5xl mx-auto">
           <motion.div className="relative inline-block mb-8" variants={itemVariants}>
-            <div className="absolute -z-10 w-24 h-24 bg-white/20 rounded-full left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+            <div className="absolute -z-10 w-28 h-28 bg-white/10 backdrop-blur-sm rounded-full left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 border border-white/20"></div>
             <div className="relative">
               <motion.div 
                 animate={{
-                  boxShadow: ['0 0 10px 2px rgba(255, 255, 255, 0.3)', '0 0 20px 6px rgba(255, 255, 255, 0.5)', '0 0 10px 2px rgba(255, 255, 255, 0.3)'],
+                  boxShadow: ['0 0 15px 2px rgba(255, 255, 255, 0.3)', '0 0 25px 8px rgba(255, 255, 255, 0.5)', '0 0 15px 2px rgba(255, 255, 255, 0.3)'],
                 }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="rounded-full p-2"
+                transition={{ duration: 3, repeat: Infinity }}
+                className="rounded-full p-3"
               >
                 <Coffee size={64} className="text-white" />
               </motion.div>
@@ -151,20 +194,20 @@ const Index = () => {
           </motion.div>
           
           <motion.div variants={itemVariants} className="mb-2">
-            <Badge className="bg-white/20 text-white text-xs uppercase tracking-widest font-medium px-3 py-1 rounded-full">
-              Premium Experience
+            <Badge className="badge-premium">
+              VSP Premium Experience
             </Badge>
           </motion.div>
           
           <motion.h1 
-            className="text-5xl md:text-6xl font-cafe font-bold text-white mb-4"
+            className="text-5xl md:text-7xl font-cafe font-bold text-white mb-4 tracking-tight"
             variants={itemVariants}
           >
             VSP AI Café Menu
           </motion.h1>
           
           <motion.div 
-            className="w-24 h-1 bg-gold-gradient mx-auto mb-6"
+            className="w-32 h-1 bg-gold-gradient mx-auto mb-6"
             variants={itemVariants}
           />
           
@@ -198,294 +241,211 @@ const Index = () => {
             </motion.div>
           ) : (
             <motion.div 
-              className="mb-8"
+              className="mb-8 p-3 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 inline-block"
               variants={itemVariants}
             >
-              <Badge className="bg-white text-vsp-blue px-4 py-2 text-lg font-medium shadow-premium">
-                <CircleUser size={18} className="mr-2" />
-                Welcome, {session.userName}!
-              </Badge>
+              <p className="text-white/90 flex items-center">
+                <CircleUser size={16} className="mr-2 text-vsp-highlight" />
+                Welcome, <span className="font-medium ml-1">{session.userName}</span>
+              </p>
             </motion.div>
           )}
           
-          <motion.div 
-            className="flex flex-col sm:flex-row gap-4 justify-center"
-            variants={itemVariants}
-          >
-            <Button 
-              size="lg" 
-              className="bg-white hover:bg-white/90 font-medium text-vsp-blue hover-lift"
-              onClick={() => document.getElementById('menu')?.scrollIntoView({ behavior: 'smooth' })}
-            >
-              <BookOpen size={18} className="mr-2" />
-              Browse Menu
-              <ArrowDown size={16} className="ml-2" />
-            </Button>
-            
-            {hasCompletedItems && (
+          <motion.div variants={itemVariants} className="flex flex-col md:flex-row justify-center gap-4 mt-6">
+            {!hasOrder && (
               <Button 
-                size="lg" 
-                variant="outline"
-                className="border-white text-white hover:bg-white/10 hover-lift"
-                onClick={() => setShowReceipt(!showReceipt)}
+                className="premium-button group"
+                size="lg"
+                onClick={() => document.getElementById('menu-section')?.scrollIntoView({ behavior: 'smooth' })}
               >
-                {showReceipt ? 'Hide Receipt' : 'View Learning Receipt'}
-                {!showReceipt && (
-                  <Badge className="ml-2 bg-white text-vsp-blue">
-                    {session.completedItems.length}
-                  </Badge>
-                )}
+                <span>Explore Menu</span>
+                <ChevronDown size={16} className="ml-2 group-hover:translate-y-1 transition-transform duration-300" />
               </Button>
             )}
             
-            {hasOrder && !hasCompletedItems && (
+            {hasOrder && !showReceipt && (
               <Button 
-                size="lg" 
-                variant="outline"
-                className="border-white text-white hover:bg-white/10 hover-lift"
-                onClick={() => setShowReceipt(!showReceipt)}
+                className="premium-button-gold group"
+                size="lg"
+                onClick={() => setShowReceipt(true)}
               >
-                <ShoppingCart size={18} className="mr-2" />
-                View Current Orders
+                <ShoppingCart size={16} className="mr-2" />
+                <span>View Receipt</span>
+              </Button>
+            )}
+            
+            {hasCompletedItems && (
+              <Button 
+                variant="outline"
+                size="lg"
+                className="bg-white/10 backdrop-blur-sm text-white border-white/20 hover:bg-white/20 hover:text-white"
+                onClick={() => window.open('/lesson-page', '_blank')}
+              >
+                <BookOpen size={16} className="mr-2" />
+                <span>View Lessons</span>
               </Button>
             )}
           </motion.div>
           
-          <motion.div 
-            className="absolute bottom-0 left-0 right-0 flex justify-center"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ 
-              opacity: scrolled ? 0 : 1,
-              y: scrolled ? 20 : 0 
-            }}
-            transition={{ duration: 0.3 }}
+          <motion.div
+            variants={itemVariants}
+            className="absolute bottom-0 left-1/2 -translate-x-1/2 transform translate-y-1/2"
           >
-            <ArrowDown size={30} className="text-white/60 animate-bounce" />
+            <motion.div 
+              className="p-3 bg-white rounded-full cursor-pointer hover-lift shadow-lg"
+              onClick={() => document.getElementById('features-section')?.scrollIntoView({ behavior: 'smooth' })}
+              whileHover={{ y: -5 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            >
+              <ArrowDown size={24} className="text-vsp-blue" />
+            </motion.div>
           </motion.div>
         </div>
       </motion.section>
       
-      {/* Receipt section (conditionally shown) */}
-      {showReceipt && (
-        <section className="mb-16">
-          <EnhancedReceiptSummary />
-        </section>
-      )}
-      
-      {/* Menu section */}
-      <section id="menu" className="pt-4">
-        <EnhancedMenuDisplay />
-      </section>
-      
-      {/* Features section */}
-      <section className="mt-24 mb-16">
+      {/* Features Section */}
+      <section id="features-section" className="mb-16 px-6">
         <div className="text-center mb-12">
-          <Badge className="mb-3 bg-vsp-blue/10 text-vsp-blue uppercase tracking-widest font-medium py-1 px-3">
-            Premium Experience
-          </Badge>
-          <h2 className="text-3xl md:text-4xl font-cafe font-bold vsp-gradient-text mb-3">
-            Learning Features
+          <Badge className="badge-premium-gold mb-2">Exclusive Learning Experience</Badge>
+          <h2 className="text-3xl md:text-4xl font-cafe font-bold mb-3 text-vsp-darkgray dark:text-white">
+            <span className="gold-gradient-text">Premium</span> AI Learning Journey
           </h2>
-          <div className="w-24 h-1 bg-gold-gradient mx-auto mb-6" />
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Our AI Café experience is designed to provide the perfect blend of education and enjoyment
+          <div className="premium-divider-gold">
+            <Star className="text-vsp-premium" size={16} />
+          </div>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Discover a carefully curated curriculum designed for both beginners and experts in artificial intelligence
           </p>
         </div>
         
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <motion.div 
-            className="premium-card p-6 rounded-xl hover-lift group"
-            whileHover={{ y: -5 }}
-          >
-            <div className="premium-card-header mb-6">
-              <div className="bg-vsp-blue/10 w-16 h-16 rounded-full flex items-center justify-center mb-4 group-hover:bg-vsp-blue/20 transition-colors duration-300">
-                <Brain className="text-vsp-blue" size={28} />
-              </div>
-              <h3 className="text-xl font-cafe font-semibold mb-2 text-vsp-blue">
-                Interactive Learning
-              </h3>
-              <p className="text-muted-foreground">
-                Engage with hands-on simulations, quizzes, and challenges that reinforce key concepts through active participation.
-              </p>
-            </div>
-          </motion.div>
-          
-          <motion.div 
-            className="premium-card p-6 rounded-xl hover-lift group"
-            whileHover={{ y: -5 }}
-          >
-            <div className="premium-card-header mb-6">
-              <div className="bg-vsp-blue/10 w-16 h-16 rounded-full flex items-center justify-center mb-4 group-hover:bg-vsp-blue/20 transition-colors duration-300">
-                <Coffee className="text-vsp-blue" size={28} />
-              </div>
-              <h3 className="text-xl font-cafe font-semibold mb-2 text-vsp-blue">
-                Perfect Pairings
-              </h3>
-              <p className="text-muted-foreground">
-                Each learning module is carefully paired with a complementary coffee to enhance your cognitive experience.
-              </p>
-            </div>
-          </motion.div>
-          
-          <motion.div 
-            className="premium-card p-6 rounded-xl hover-lift group"
-            whileHover={{ y: -5 }}
-          >
-            <div className="premium-card-header mb-6">
-              <div className="bg-vsp-blue/10 w-16 h-16 rounded-full flex items-center justify-center mb-4 group-hover:bg-vsp-blue/20 transition-colors duration-300">
-                <BookOpen className="text-vsp-blue" size={28} />
-              </div>
-              <h3 className="text-xl font-cafe font-semibold mb-2 text-vsp-blue">
-                Curated Content
-              </h3>
-              <p className="text-muted-foreground">
-                Expert-crafted learning modules ensure you receive accurate, up-to-date, and applicable AI knowledge.
-              </p>
-            </div>
-          </motion.div>
-          
-          <motion.div 
-            className="premium-card p-6 rounded-xl hover-lift group"
-            whileHover={{ y: -5 }}
-          >
-            <div className="premium-card-header mb-6">
-              <div className="bg-vsp-blue/10 w-16 h-16 rounded-full flex items-center justify-center mb-4 group-hover:bg-vsp-blue/20 transition-colors duration-300">
-                <ShoppingCart className="text-vsp-blue" size={28} />
-              </div>
-              <h3 className="text-xl font-cafe font-semibold mb-2 text-vsp-blue">
-                Learning Receipts
-              </h3>
-              <p className="text-muted-foreground">
-                Track your progress with detailed learning receipts that document your journey and skills acquired.
-              </p>
-            </div>
-          </motion.div>
-          
-          <motion.div 
-            className="md:col-span-2 lg:col-span-1 premium-section group"
-            whileHover={{ scale: 1.02 }}
-            transition={{ type: "spring", stiffness: 300 }}
-          >
-            <div className="relative z-10">
-              <div className="bg-white/20 w-16 h-16 rounded-full flex items-center justify-center mb-4 group-hover:bg-white/30 transition-colors duration-300">
-                <Medal className="text-white" size={28} />
-              </div>
-              <h3 className="text-xl font-cafe font-semibold mb-2">
-                Premium Experience
-              </h3>
-              <p className="text-blue-50 mb-6 max-w-sm">
-                Our AI Café provides a premium learning environment with carefully crafted content and an intuitive interface designed for enjoyable, efficient knowledge acquisition.
-              </p>
-              <Button variant="outline" className="border-white text-white hover:bg-white/20 hover:border-transparent">
-                <Sparkles size={16} className="mr-2" />
-                Explore Premium Features
-              </Button>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Testimonials section */}
-      <section className="mb-24 bg-white dark:bg-vsp-blue/5 rounded-xl p-8 shadow-premium">
-        <div className="text-center mb-12">
-          <Badge className="mb-3 bg-vsp-blue/10 text-vsp-blue uppercase tracking-widest font-medium py-1 px-3">
-            Success Stories
-          </Badge>
-          <h2 className="text-3xl md:text-4xl font-cafe font-bold vsp-gradient-text mb-3">
-            What Our Learners Say
-          </h2>
-          <div className="w-24 h-1 bg-gold-gradient mx-auto mb-6" />
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           {[
             {
-              name: "Alex Chen",
-              role: "Data Scientist",
-              quote: "The VSP AI Café approach made complex AI concepts accessible and enjoyable. The coffee pairings actually enhanced my focus!",
-              avatar: "AC"
+              icon: <GraduationCap size={28} />,
+              title: "Structured Learning",
+              description: "Progressive modules designed to build your AI knowledge from fundamentals to advanced concepts"
             },
             {
-              name: "Sarah Johnson",
-              role: "Software Engineer",
-              quote: "I've tried many online courses, but the premium experience here is unmatched. The interactive elements truly cemented my understanding.",
-              avatar: "SJ"
+              icon: <Coffee size={28} />,
+              title: "Perfect Pairings",
+              description: "Each learning module paired with a specialty coffee to enhance your learning experience"
             },
             {
-              name: "Michael Rivera",
-              role: "Product Manager",
-              quote: "As someone without a technical background, I was amazed at how approachable these AI modules were. The premium design made learning a pleasure.",
-              avatar: "MR"
+              icon: <Brain size={28} />,
+              title: "Expert Guidance",
+              description: "Content developed by industry leaders and academic experts in artificial intelligence"
             }
-          ].map((testimonial, index) => (
-            <motion.div 
-              key={index}
-              className="premium-card overflow-hidden"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
+          ].map((feature, i) => (
+            <motion.div
+              key={i}
+              custom={i}
+              variants={featureCardVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
+              className="vsp-premium-card p-6 hover-lift"
             >
-              <div className="p-6">
-                <div className="flex items-center mb-4">
-                  <div className="bg-vsp-blue text-white w-12 h-12 rounded-full flex items-center justify-center font-medium text-lg mr-4">
-                    {testimonial.avatar}
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-vsp-darkgray">{testimonial.name}</h4>
-                    <p className="text-sm text-muted-foreground">{testimonial.role}</p>
-                  </div>
-                </div>
-                <div className="gold-accent">
-                  <p className="text-muted-foreground italic">"{testimonial.quote}"</p>
-                </div>
-                <div className="flex mt-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={16} className="text-vsp-gold" fill="#D4AF37" />
-                  ))}
-                </div>
+              <div className="mb-4 p-3 rounded-full bg-vsp-blue/10 inline-block text-vsp-blue">
+                {feature.icon}
               </div>
+              <h3 className="text-xl font-semibold mb-2 text-vsp-darkgray dark:text-white">
+                {feature.title}
+              </h3>
+              <p className="text-muted-foreground">
+                {feature.description}
+              </p>
             </motion.div>
           ))}
         </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="mb-16">
-        <div className="premium-section">
-          <div className="max-w-3xl mx-auto text-center relative z-10">
-            <motion.div 
-              className="bg-white/20 w-20 h-20 rounded-full mx-auto flex items-center justify-center mb-6"
-              animate={{
-                boxShadow: ['0 0 10px 2px rgba(255, 255, 255, 0.3)', '0 0 20px 6px rgba(255, 255, 255, 0.5)', '0 0 10px 2px rgba(255, 255, 255, 0.3)'],
-              }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
-              <CheckCircle size={36} className="text-white" />
-            </motion.div>
-            <h2 className="text-3xl md:text-4xl font-cafe font-bold text-white mb-4">
-              Ready to Enhance Your AI Knowledge?
-            </h2>
-            <p className="text-xl text-white/80 mb-8">
-              Start your premium learning journey today with our expertly crafted modules and coffee pairings
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                size="lg" 
-                className="bg-white hover:bg-white/90 text-vsp-blue font-medium hover-lift"
-              >
-                <Brain size={18} className="mr-2" />
-                Start Learning Now
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="border-white text-white hover:bg-white/10 hover-lift"
-              >
-                <Eye size={18} className="mr-2" />
-                Browse Course Catalog
-              </Button>
+        
+        {/* Testimonial Section */}
+        <div className="mb-16">
+          <div className="premium-section rounded-xl overflow-hidden">
+            <div className="absolute inset-0 opacity-10">
+              <div className="grid grid-cols-3 h-full">
+                {Array.from({ length: 9 }).map((_, i) => (
+                  <div key={i} className="border border-white/10"></div>
+                ))}
+              </div>
             </div>
+            
+            <div className="relative z-10">
+              <div className="flex justify-center mb-6">
+                <div className="bg-white/20 p-2 rounded-full">
+                  <MessageSquareQuote size={32} className="text-white" />
+                </div>
+              </div>
+              
+              <div className="max-w-3xl mx-auto text-center">
+                <div className="h-32 relative">
+                  {testimonials.map((testimonial, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ 
+                        opacity: activeTestimonial === i ? 1 : 0,
+                        y: activeTestimonial === i ? 0 : 20,
+                      }}
+                      transition={{ duration: 0.5 }}
+                      className="absolute inset-0 flex flex-col items-center justify-center"
+                      style={{ display: activeTestimonial === i ? 'flex' : 'none' }}
+                    >
+                      <p className="text-xl italic mb-4">{testimonial.quote}</p>
+                      <div>
+                        <p className="font-medium">{testimonial.author}</p>
+                        <p className="text-white/70 text-sm">{testimonial.title}</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+                
+                <div className="flex justify-center gap-2 mt-6">
+                  {testimonials.map((_, i) => (
+                    <button
+                      key={i}
+                      className={`w-2 h-2 rounded-full ${activeTestimonial === i ? 'bg-white' : 'bg-white/30'} transition-all duration-300`}
+                      onClick={() => setActiveTestimonial(i)}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      {/* Menu Section */}
+      <section id="menu-section" className="mb-12 px-6">
+        {showReceipt ? (
+          <EnhancedReceiptSummary />
+        ) : (
+          <EnhancedMenuDisplay 
+            title="VSP AI Learning Menu"
+            description="Select from our premium collection of AI learning modules and craft your personalized journey"
+          />
+        )}
+      </section>
+      
+      {/* CTA Section */}
+      <section className="mb-16 px-6">
+        <div className="premium-section-gold rounded-xl overflow-hidden text-center">
+          <div className="relative z-10">
+            <Badge className="bg-vsp-premium/10 text-vsp-premium font-medium px-3 py-1 rounded-full mb-4 border border-vsp-premium/20">
+              Limited Time Offer
+            </Badge>
+            <h2 className="text-3xl md:text-4xl font-cafe font-bold mb-4 text-vsp-darkgray">
+              Begin Your Premium AI Learning Journey
+            </h2>
+            <p className="text-xl mb-8 text-vsp-darkgray/80 max-w-2xl mx-auto">
+              Experience the perfect blend of AI education and premium coffee—tailored to your learning style.
+            </p>
+            <Button 
+              className="bg-vsp-blue hover:bg-vsp-blue/90 text-white font-medium px-8 py-6 rounded-md text-lg hover-lift"
+              onClick={() => document.getElementById('menu-section')?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              <BadgeCheck size={20} className="mr-2" />
+              <span>Start Your Journey</span>
+            </Button>
           </div>
         </div>
       </section>

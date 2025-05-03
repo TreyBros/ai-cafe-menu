@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -11,7 +11,10 @@ import {
   Flame,
   Heart,
   Info,
-  PlusCircle
+  PlusCircle,
+  Check,
+  BookOpen,
+  Brain
 } from 'lucide-react';
 
 import { 
@@ -37,7 +40,7 @@ import {
 
 import { 
   getMenuItemById, 
-  getMenuItemsByCategory, 
+  menuItems,
   getPairingCoffees, 
   MenuItem, 
   CoffeeItem 
@@ -64,7 +67,7 @@ const cardVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
   hover: { 
     y: -8, 
-    boxShadow: "0 20px 30px -5px rgba(0, 57, 166, 0.2), 0 10px 15px -5px rgba(0, 57, 166, 0.1)",
+    boxShadow: "0 20px 35px -10px rgba(0, 31, 84, 0.2), 0 10px 20px -5px rgba(0, 57, 166, 0.15)",
     transition: { duration: 0.3 }
   }
 };
@@ -90,17 +93,29 @@ const MenuItemCard: React.FC<MenuItemCardProps> = ({ item, onSelect, delay = 0 }
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
     >
-      <Card className={`h-full border-2 overflow-hidden transition-all duration-300 shadow-premium hover:shadow-premium-hover ${isHovered ? 'border-vsp-blue dark:border-vsp-blue' : 'border-transparent'}`}>
-        <div className={`h-32 overflow-hidden bg-gradient-to-br ${item.bgColor} relative premium-card-header`}>
+      <Card className={`h-full border-2 overflow-hidden transition-all duration-300 shadow-vsp-card hover:shadow-vsp-card-hover ${isHovered ? 'border-vsp-blue dark:border-vsp-blue' : 'border-transparent'}`}>
+        <div className={`h-32 overflow-hidden bg-gradient-to-br ${item.bgColor} relative premium-card-header-blue`}>
           {item.featured && (
             <div className="absolute top-2 right-2 z-10">
-              <Badge className="bg-vsp-blue hover:bg-vsp-blue/90 text-white font-medium">
+              <Badge className="bg-vsp-gold hover:bg-vsp-gold/90 text-vsp-darkgray font-medium">
                 <Star className="mr-1 h-3 w-3" /> Featured
               </Badge>
             </div>
           )}
           <div className="h-full flex items-center justify-center p-4">
-            <Coffee size={52} className="text-vsp-blue/70" />
+            <motion.div
+              animate={{ 
+                y: [0, -5, 0],
+                rotate: isHovered ? [0, 5, 0] : 0 
+              }}
+              transition={{ 
+                duration: 3, 
+                repeat: Infinity, 
+                ease: "easeInOut" 
+              }}
+            >
+              <Coffee size={52} className="text-vsp-blue/70" />
+            </motion.div>
           </div>
         </div>
         
@@ -208,69 +223,46 @@ const CoffeeCard: React.FC<CoffeeCardProps> = ({ coffee, isSelected, onToggle, d
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: delay * 0.1 }}
-      className="h-full"
-      whileHover={{ y: -5 }}
+      transition={{ delay: delay * 0.1, duration: 0.4 }}
+      className="relative"
     >
-      <Card className={`h-full cursor-pointer transition-all duration-300 shadow-premium hover:shadow-premium-hover ${isSelected ? 'ring-2 ring-vsp-blue dark:ring-blue-400' : ''}`}
-        onClick={() => onToggle(coffee)}>
-        <CardHeader className="p-4 pb-2 premium-card-header">
-          <div className="flex justify-between items-start">
-            <CardTitle className="text-md font-cafe text-vsp-darkgray dark:text-blue-light">
-              {coffee.name}
-            </CardTitle>
-            <div className="text-md font-semibold text-vsp-blue dark:text-blue-light">
-              {coffee.price}
+      <div 
+        className={`p-4 rounded-lg cursor-pointer transition-all duration-300 hover-lift ${
+          isSelected 
+            ? 'bg-vsp-blue/10 border-2 border-vsp-blue dark:bg-vsp-blue/20 dark:border-vsp-blue/70' 
+            : 'bg-card border-2 border-transparent hover:border-vsp-blue/40 dark:hover:border-vsp-blue/40'
+        }`}
+        onClick={() => onToggle(coffee)}
+      >
+        <div className="flex items-center">
+          <div className="relative mr-3">
+            <div className={`w-12 h-12 rounded-full bg-vsp-blue/10 flex items-center justify-center ${isSelected ? 'premium-glow' : ''}`}>
+              <Coffee size={24} className="text-vsp-blue" />
             </div>
-          </div>
-          <CardDescription className="line-clamp-2 text-sm">
-            {coffee.description}
-          </CardDescription>
-        </CardHeader>
-        
-        <CardContent className="p-4 pt-0">
-          <div className="text-xs text-muted-foreground mb-1">
-            <span className="font-semibold">Origin:</span> {coffee.origin || 'Various sources'}
-          </div>
-          <div className="text-xs text-muted-foreground mb-1">
-            <span className="font-semibold">Preparation:</span> {coffee.preparation || 'Standard brewing'}
-          </div>
-          <div className="flex flex-wrap gap-1 mt-2">
-            {coffee.flavorNotes?.map((note, index) => (
-              <Badge key={index} variant="outline" className="text-xs bg-vsp-blue/10 text-vsp-blue dark:bg-blue-900 dark:text-blue-50">
-                {note}
-              </Badge>
-            )) || (
-              <Badge variant="outline" className="text-xs bg-vsp-blue/10 text-vsp-blue dark:bg-blue-900 dark:text-blue-50">
-                Premium Blend
-              </Badge>
+            {isSelected && (
+              <motion.div 
+                className="absolute -top-1 -right-1 bg-vsp-blue text-white rounded-full w-5 h-5 flex items-center justify-center"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              >
+                <Check size={12} />
+              </motion.div>
             )}
           </div>
-        </CardContent>
-        
-        <CardFooter className="p-4 pt-0">
-          <Button 
-            variant={isSelected ? "default" : "outline"}
-            className={`w-full ${isSelected ? 'bg-premium-gradient hover:bg-vsp-blue text-white' : 'border-vsp-blue text-vsp-darkgray hover:bg-vsp-blue/5 dark:text-blue-light'}`}
-            onClick={(e) => {
-              e.preventDefault();
-              onToggle(coffee);
-            }}
-          >
-            {isSelected ? (
-              <>
-                <BadgeCheck size={16} className="mr-2" />
-                Selected
-              </>
-            ) : (
-              <>
-                <PlusCircle size={16} className="mr-2" />
-                Add to Order
-              </>
+          <div className="flex-1">
+            <div className="flex justify-between items-center">
+              <h3 className="font-medium text-vsp-darkgray dark:text-white">{coffee.name}</h3>
+              <span className="text-sm font-medium text-vsp-blue dark:text-blue-light">{coffee.price}</span>
+            </div>
+            {coffee.flavorNotes && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Notes: {coffee.flavorNotes.join(', ')}
+              </p>
             )}
-          </Button>
-        </CardFooter>
-      </Card>
+          </div>
+        </div>
+      </div>
     </motion.div>
   );
 };
@@ -437,150 +429,208 @@ const EnhancedMenuDisplay: React.FC<EnhancedMenuDisplayProps> = ({
   showIntro = true
 }) => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<string>("appetizer");
-  const [selectedCoffees, setSelectedCoffees] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState<string>("featured");
   const [previewItem, setPreviewItem] = useState<MenuItem | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const { session, createOrder } = useSessionStore();
   
-  const { createOrder, session } = useSessionStore();
+  // Get featured items (items marked as featured or popular)
+  const featuredItems = menuItems.filter(item => 
+    item.featured || (item.badges && item.badges.includes('Popular'))
+  );
   
-  const appetizers = getMenuItemsByCategory('appetizer');
-  const entrees = getMenuItemsByCategory('entree');
-  const desserts = getMenuItemsByCategory('dessert');
+  // Get courses (items categorized as course)
+  const courseItems = menuItems.filter(item => item.category === 'course');
   
-  // Find if a coffee is selected
-  const isCoffeeSelected = (id: string) => selectedCoffees.includes(id);
+  // Get workshops (items categorized as workshop)
+  const workshopItems = menuItems.filter(item => item.category === 'workshop');
   
-  // Toggle coffee selection
+  const isCoffeeSelected = (id: string) => session.selectedCoffees.some(coffee => coffee.id === id);
+  
   const toggleCoffeeSelection = (coffee: CoffeeItem) => {
-    setSelectedCoffees(prev => 
-      prev.includes(coffee.id) 
-        ? prev.filter(id => id !== coffee.id) 
-        : [...prev, coffee.id]
-    );
+    const { addCoffeeToSelection, removeCoffeeFromSelection } = useSessionStore.getState();
+    
+    if (isCoffeeSelected(coffee.id)) {
+      removeCoffeeFromSelection(coffee.id);
+    } else {
+      addCoffeeToSelection({
+        id: coffee.id,
+        name: coffee.name,
+        price: coffee.price,
+        image: coffee.image
+      });
+    }
   };
   
-  // Open preview dialog
   const handlePreview = (item: MenuItem) => {
     setPreviewItem(item);
+    setIsPreviewOpen(true);
   };
   
-  // Close preview dialog
   const handleClosePreview = () => {
+    setIsPreviewOpen(false);
     setPreviewItem(null);
   };
   
-  // Handle selection from preview dialog
   const handleSelect = (menuItem: MenuItem, coffeeId?: string) => {
     // Create an order with this menu item and optional coffee
     createOrder(menuItem.id, coffeeId);
     
     // Navigate to lesson page
-    navigate(`/lesson/${menuItem.id}`);
+    setIsPreviewOpen(false);
+    
+    if (menuItem.proceedToLesson) {
+      setTimeout(() => {
+        navigate('/lesson-page');
+      }, 500);
+    }
   };
   
   return (
-    <div>
+    <div className="py-6">
       {showIntro && (
-        <div className="mb-8">
-          <Badge className="mb-3 bg-vsp-blue/10 text-vsp-blue uppercase tracking-widest font-medium py-1 px-3">
-            Premium Selection
+        <motion.div 
+          className="mb-12 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <Badge className="badge-premium-gold mb-2">
+            VSP Premium Selection
           </Badge>
-          <h2 className="text-3xl md:text-4xl font-cafe font-bold vsp-gradient-text mb-3">
+          <h2 className="text-3xl md:text-4xl font-cafe font-bold mb-2 text-vsp-darkgray dark:text-white">
             {title}
           </h2>
-          <div className="w-24 h-1 bg-gold-gradient mb-6" />
-          <p className="text-muted-foreground">
+          <div className="premium-divider-gold">
+            <Star className="text-vsp-premium" size={16} />
+          </div>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             {description}
           </p>
-        </div>
+        </motion.div>
       )}
       
-      <Tabs defaultValue="appetizer" value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="w-full mb-6 grid grid-cols-4 bg-vsp-blue/5 dark:bg-blue-900/30">
-          <TabsTrigger 
-            value="appetizer" 
-            className="vsp-nav-item data-[state=active]:bg-vsp-blue data-[state=active]:text-white dark:data-[state=active]:bg-vsp-blue"
-          >
-            Appetizers
+      <Tabs 
+        defaultValue="featured" 
+        className="w-full"
+        value={activeTab}
+        onValueChange={setActiveTab}
+      >
+        <TabsList className="w-full max-w-xl mx-auto grid grid-cols-4 mb-8">
+          <TabsTrigger value="featured" className="vsp-nav-item data-[state=active]:bg-vsp-blue data-[state=active]:text-white">
+            <Star className="w-4 h-4 mr-2" />
+            Featured
           </TabsTrigger>
-          <TabsTrigger 
-            value="entree" 
-            className="vsp-nav-item data-[state=active]:bg-vsp-blue data-[state=active]:text-white dark:data-[state=active]:bg-vsp-blue"
-          >
-            Entrées
+          <TabsTrigger value="courses" className="vsp-nav-item data-[state=active]:bg-vsp-blue data-[state=active]:text-white">
+            <BookOpen className="w-4 h-4 mr-2" />
+            Courses
           </TabsTrigger>
-          <TabsTrigger 
-            value="dessert" 
-            className="vsp-nav-item data-[state=active]:bg-vsp-blue data-[state=active]:text-white dark:data-[state=active]:bg-vsp-blue"
-          >
-            Desserts
+          <TabsTrigger value="workshops" className="vsp-nav-item data-[state=active]:bg-vsp-blue data-[state=active]:text-white">
+            <Brain className="w-4 h-4 mr-2" />
+            Workshops
           </TabsTrigger>
-          <TabsTrigger 
-            value="coffee" 
-            className="vsp-nav-item data-[state=active]:bg-vsp-blue data-[state=active]:text-white dark:data-[state=active]:bg-vsp-blue"
-          >
+          <TabsTrigger value="coffee" className="vsp-nav-item data-[state=active]:bg-vsp-blue data-[state=active]:text-white">
+            <Coffee className="w-4 h-4 mr-2" />
             Coffee
           </TabsTrigger>
         </TabsList>
         
-        <TabsContent value="appetizer" className="mt-0">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {appetizers.map((item, index) => (
-              <MenuItemCard 
-                key={item.id} 
-                item={item} 
-                onSelect={handlePreview}
-                delay={index}
-              />
-            ))}
-          </div>
+        <TabsContent value="featured" className="space-y-8">
+          <motion.section
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featuredItems.map((item, index) => (
+                <MenuItemCard 
+                  key={item.id} 
+                  item={item} 
+                  onSelect={handlePreview} 
+                  delay={index}
+                />
+              ))}
+            </div>
+          </motion.section>
         </TabsContent>
         
-        <TabsContent value="entree" className="mt-0">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {entrees.map((item, index) => (
-              <MenuItemCard 
-                key={item.id} 
-                item={item} 
-                onSelect={handlePreview}
-                delay={index}
-              />
-            ))}
-          </div>
+        <TabsContent value="courses" className="space-y-8">
+          <motion.section
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {courseItems.map((item, index) => (
+                <MenuItemCard 
+                  key={item.id} 
+                  item={item} 
+                  onSelect={handlePreview}
+                  delay={index}
+                />
+              ))}
+            </div>
+          </motion.section>
         </TabsContent>
         
-        <TabsContent value="dessert" className="mt-0">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {desserts.map((item, index) => (
-              <MenuItemCard 
-                key={item.id} 
-                item={item} 
-                onSelect={handlePreview}
-                delay={index}
-              />
-            ))}
-          </div>
+        <TabsContent value="workshops" className="space-y-8">
+          <motion.section
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {workshopItems.map((item, index) => (
+                <MenuItemCard 
+                  key={item.id} 
+                  item={item} 
+                  onSelect={handlePreview}
+                  delay={index}
+                />
+              ))}
+            </div>
+          </motion.section>
         </TabsContent>
         
-        <TabsContent value="coffee" className="mt-0">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {session.selectedCoffees.map((coffee, index) => (
-              <CoffeeCard 
-                key={coffee.id} 
-                coffee={coffee} 
-                isSelected={isCoffeeSelected(coffee.id)}
-                onToggle={toggleCoffeeSelection}
-                delay={index}
-              />
-            ))}
-          </div>
+        <TabsContent value="coffee" className="space-y-8">
+          <motion.section
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="vsp-premium-card-gold p-6 mb-6">
+              <h3 className="font-cafe font-semibold text-xl mb-3 text-vsp-darkgray">Enhance Your Experience</h3>
+              <p className="text-muted-foreground mb-4">Select from our premium coffee collection to pair with your learning modules</p>
+              <div className="flex items-center gap-2 text-sm">
+                <div className="bg-vsp-premium/10 p-1.5 rounded-full">
+                  <BadgeCheck size={16} className="text-vsp-premium" />
+                </div>
+                <span className="text-vsp-darkgray">Expertly paired to enhance cognition and focus</span>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {session.selectedCoffees.map((coffee, index) => (
+                <CoffeeCard 
+                  key={coffee.id}
+                  coffee={coffee}
+                  isSelected={isCoffeeSelected(coffee.id)}
+                  onToggle={toggleCoffeeSelection}
+                  delay={index}
+                />
+              ))}
+            </div>
+          </motion.section>
         </TabsContent>
       </Tabs>
       
-      {/* Preview Dialog */}
       <PreviewDialog 
         menuItem={previewItem} 
-        isOpen={!!previewItem} 
+        isOpen={isPreviewOpen} 
         onClose={handleClosePreview}
         onSelect={handleSelect}
       />
