@@ -24,8 +24,8 @@ const LessonContent: React.FC<LessonContentProps> = ({ lesson }) => {
       id: lesson.id,
       title: lesson.title,
       category: lesson.category,
-      price: lesson.price,  // Add the required price property
-      image: lesson.image   // Add the image property for consistency
+      price: lesson.price,  // Ensure price property is included
+      image: lesson.image   // Ensure image property is included
     });
     
     toast({
@@ -43,7 +43,7 @@ const LessonContent: React.FC<LessonContentProps> = ({ lesson }) => {
     <div className="animate-fade-in">
       <Button 
         variant="ghost" 
-        className="mb-6 flex items-center text-blue-dark dark:text-blue-light"
+        className="mb-6 flex items-center text-blue-medium hover:text-blue-dark dark:text-blue-light"
         onClick={() => navigate('/')}
       >
         <ArrowLeft size={16} className="mr-2" />
@@ -60,49 +60,53 @@ const LessonContent: React.FC<LessonContentProps> = ({ lesson }) => {
         </div>
       </div>
       
-      <Card className="mb-6">
+      <Card className="mb-6 border-blue-light/20 shadow-glow">
         <CardContent className="pt-6">
-          <p className="text-lg mb-8">{lesson.content.intro}</p>
+          <p className="text-lg mb-8">{lesson.content?.intro || "No content available"}</p>
           
           {/* Key learning points */}
-          <div className="mb-8">
-            <h3 className="text-xl font-cafe font-semibold mb-4">Key Points</h3>
-            <ul className="space-y-3">
-              {lesson.content.keyPoints.map((point, index) => (
-                <li key={index} className="flex">
-                  <CheckCircle size={20} className="text-highlights-blue mr-3 mt-1 flex-shrink-0" />
-                  <span>{point}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {lesson.content?.keyPoints && lesson.content.keyPoints.length > 0 && (
+            <div className="mb-8">
+              <h3 className="text-xl font-cafe font-semibold mb-4">Key Points</h3>
+              <ul className="space-y-3">
+                {lesson.content.keyPoints.map((point, index) => (
+                  <li key={index} className="flex">
+                    <CheckCircle size={20} className="text-highlights-blue mr-3 mt-1 flex-shrink-0" />
+                    <span>{point}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           
           {/* Interactive element placeholder */}
-          {lesson.content.interactiveElement && (
+          {lesson.content?.interactiveElement && (
             <div className="mb-8">
               <h3 className="text-xl font-cafe font-semibold mb-4">Interactive Experience</h3>
-              <div className="bg-muted p-6 rounded-lg text-center">
+              <div className="bg-blue-pale/30 dark:bg-blue-light/5 p-6 rounded-lg text-center border border-blue-light/20">
                 <p className="text-muted-foreground mb-3">
                   {typeof lesson.content.interactiveElement === 'string' 
                     ? lesson.content.interactiveElement 
-                    : lesson.content.interactiveElement.description}
+                    : lesson.content.interactiveElement.description || "Interactive content"}
                 </p>
-                <Button variant="outline" disabled>Coming Soon</Button>
+                <Button variant="outline" disabled className="border-blue-light/30 text-blue-dark dark:text-blue-light">Coming Soon</Button>
               </div>
             </div>
           )}
           
           {/* Summary */}
-          <div className="mb-6">
-            <h3 className="text-xl font-cafe font-semibold mb-4">Summary</h3>
-            <p>{lesson.content.summary}</p>
-          </div>
+          {lesson.content?.summary && (
+            <div className="mb-6">
+              <h3 className="text-xl font-cafe font-semibold mb-4">Summary</h3>
+              <p>{lesson.content.summary}</p>
+            </div>
+          )}
         </CardContent>
       </Card>
       
       {!isCompleted ? (
         <Button 
-          className="w-full md:w-auto bg-highlights-blue hover:bg-highlights-navy"
+          className="w-full md:w-auto bg-blue-medium hover:bg-blue-dark text-white shadow-blue-glow"
           size="lg"
           onClick={handleComplete}
         >
@@ -110,7 +114,7 @@ const LessonContent: React.FC<LessonContentProps> = ({ lesson }) => {
           Mark as Complete
         </Button>
       ) : (
-        <div className="bg-highlights-blue/20 text-highlights-blue p-4 rounded-lg flex items-center">
+        <div className="bg-blue-medium/20 text-blue-medium dark:text-blue-light p-4 rounded-lg flex items-center border border-blue-light/30">
           <CheckCircle size={20} className="mr-2" />
           Lesson completed! Returning to menu...
         </div>
