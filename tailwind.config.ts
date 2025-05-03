@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -26,15 +25,18 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				coffee: {
-					dark: '#3D2314',
-					medium: '#6F4E37',
-					light: '#B38867',
-					cream: '#F5F0E1',
+					dark: '#0F3460',
+					medium: '#1A5F7A',
+					light: '#57C5B6',
+					cream: '#E0F4FF',
+					paper: '#F0F9FF',
 				},
 				accent: {
-					teal: '#2A9D8F',
-					orange: '#E76F51',
-					yellow: '#F4A261',
+					DEFAULT: 'hsl(var(--accent))',
+					foreground: 'hsl(var(--accent-foreground))',
+					teal: '#2192FF',
+					orange: '#38B6FF',
+					yellow: '#89CFF3',
 				},
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
@@ -51,10 +53,6 @@ export default {
 				muted: {
 					DEFAULT: 'hsl(var(--muted))',
 					foreground: 'hsl(var(--muted-foreground))'
-				},
-				accent: {
-					DEFAULT: 'hsl(var(--accent))',
-					foreground: 'hsl(var(--accent-foreground))'
 				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover))',
@@ -78,11 +76,16 @@ export default {
 			fontFamily: {
 				'cafe': ['Playfair Display', 'serif'],
 				'sans': ['Poppins', 'sans-serif'],
+				'chalk': ['Caveat', 'cursive'],
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
+			},
+			backgroundImage: {
+				'coffee-paper': "url('data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2357C5B6' fill-opacity='0.05'%3E%3Ccircle cx='50' cy='50' r='20'/%3E%3Ccircle cx='0' cy='0' r='15'/%3E%3Ccircle cx='100' cy='0' r='15'/%3E%3Ccircle cx='100' cy='100' r='15'/%3E%3Ccircle cx='0' cy='100' r='15'/%3E%3C/g%3E%3C/svg%3E')",
+				'grid-pattern': "url('data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%231A5F7A' fill-opacity='0.05' fill-rule='evenodd'%3E%3Cpath d='M0 0h40v40H0V0zm1 1h38v38H1V1z'/%3E%3C/g%3E%3C/svg%3E')",
 			},
 			keyframes: {
 				'accordion-down': {
@@ -112,13 +115,55 @@ export default {
 						opacity: '1',
 						transform: 'translateY(0)'
 					}
+				},
+				'pour': {
+					'0%': {
+						height: '0%',
+						opacity: '0.7'
+					},
+					'100%': {
+						height: '100%',
+						opacity: '1'
+					}
+				},
+				'bounce-in': {
+					'0%': {
+						transform: 'scale(0.8)',
+						opacity: '0'
+					},
+					'50%': {
+						transform: 'scale(1.05)',
+					},
+					'70%': {
+						transform: 'scale(0.95)',
+					},
+					'100%': {
+						transform: 'scale(1)',
+						opacity: '1'
+					}
+				},
+				'fall': {
+					'0%': {
+						transform: 'translateY(-10px) rotate(0deg)',
+						opacity: '0',
+					},
+					'10%': {
+						opacity: '1',
+					},
+					'100%': {
+						transform: 'translateY(100vh) rotate(360deg)',
+						opacity: '0',
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'steam': 'steam 3s ease-in-out infinite',
-				'fade-in': 'fade-in 0.5s ease-out'
+				'fade-in': 'fade-in 0.5s ease-out',
+				'pour': 'pour 1.5s ease-in-out forwards',
+				'bounce-in': 'bounce-in 0.5s ease-out',
+				'fall': 'fall 3s ease-in forwards'
 			}
 		}
 	},

@@ -1,8 +1,22 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { CheckCircle, Search, ArrowRight, Zap } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Progress } from '@/components/ui/progress';
+import { 
+  Send, 
+  BarChart3, 
+  CheckCircle2, 
+  ArrowRight, 
+  Search,
+  Database,
+  Award,
+  Terminal,
+  BarChart
+} from 'lucide-react';
 
 interface ExerciseInteractiveProps {
   title: string;
@@ -14,341 +28,541 @@ interface ExerciseInteractiveProps {
   onComplete: () => void;
 }
 
-const ExerciseInteractive: React.FC<ExerciseInteractiveProps> = ({
-  title,
-  description,
-  data,
-  onComplete
-}) => {
+const ExerciseInteractive: React.FC<ExerciseInteractiveProps> = ({ title, description, data, onComplete }) => {
   const [userQuery, setUserQuery] = useState('');
-  const [activeScenario, setActiveScenario] = useState('');
-  const [results, setResults] = useState<any[] | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [stepCompleted, setStepCompleted] = useState(false);
-  const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 3;
+  const [results, setResults] = useState<{ query: string; result: string }[]>([]);
+  const [completedQueries, setCompletedQueries] = useState<string[]>([]);
+  const [selectedScenario, setSelectedScenario] = useState('');
+  const [workflowSteps, setWorkflowSteps] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState('exercise');
+  const [exerciseComplete, setExerciseComplete] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  
+  const { sampleQueries, scenarios } = data;
+  
+  // Helper function to generate chart data visualization
+  const generateVisualization = (query: string) => {
+    // Simplified for demo - in a real app this would use actual data visualizations
+    const salesData = {
+      "Sales trends over the last quarter": `
+📊 Quarterly Sales Trend
 
-  // Determine if this is a data analysis or workflow automation exercise
-  const isDataAnalysis = data.sampleQueries && data.sampleQueries.length > 0;
-  const isWorkflowAutomation = data.scenarios && data.scenarios.length > 0;
+Q1: $245,000 ↑ 12%
+Q2: $278,000 ↑ 13.5%
+Q3: $312,000 ↑ 12.2%
+Q4: $342,000 ↑ 9.6%
 
-  const handleSampleQuerySelect = (query: string) => {
-    setUserQuery(query);
-  };
+🔍 Key Insights:
+- Consistent growth throughout the year
+- Highest growth rate in Q2
+- Slight slowdown in growth rate during Q4
+- Overall annual growth: 11.8%
 
-  const handleScenarioSelect = (scenario: string) => {
-    setActiveScenario(scenario);
-    setStepCompleted(false);
-    setCurrentStep(1);
-  };
-
-  const handleDataQuery = () => {
-    if (!userQuery) return;
-
-    setIsLoading(true);
-    
-    // Simulate API call delay
-    setTimeout(() => {
-      // Generate mock results based on the query
-      let mockResults = [];
+Would you like to see this data broken down by product category or region?
+      `,
       
-      if (userQuery.toLowerCase().includes('sales trends')) {
-        mockResults = [
-          { month: 'January', sales: 45000, trend: '+5%' },
-          { month: 'February', sales: 52000, trend: '+15%' },
-          { month: 'March', sales: 48000, trend: '-8%' }
-        ];
-      } else if (userQuery.toLowerCase().includes('profit margin')) {
-        mockResults = [
-          { product: 'Premium Plan', margin: '72%', rank: 1 },
-          { product: 'Standard Plan', margin: '68%', rank: 2 },
-          { product: 'Basic Plan', margin: '54%', rank: 3 }
-        ];
-      } else if (userQuery.toLowerCase().includes('forecast')) {
-        mockResults = [
-          { month: 'Current', revenue: '$120,000' },
-          { month: 'Next (Forecast)', revenue: '$135,000', confidence: '87%' }
-        ];
-      } else {
-        mockResults = [
-          { result: 'No specific data found for this query' },
-          { suggestion: 'Try asking about sales trends, profit margins, or forecasts' }
-        ];
+      "Which product has the highest profit margin?": `
+📈 Product Profit Margin Analysis
+
+Top 5 Products by Margin:
+1. Premium Software Subscription: 78% 
+2. Enterprise Support Package: 65%
+3. Cloud Hosting - Enterprise Tier: 61%
+4. Professional Services Consultation: 58% 
+5. Developer API Package: 52%
+
+🔍 Key Insights:
+- Digital products dominate the highest margin category
+- Service-based offerings outperform hardware products
+- Lowest margin product: Budget Hardware (12%)
+- Recommendation: Focus marketing resources on top 3 margin leaders
+
+Would you like to see trend analysis of these margins over time?
+      `,
+      
+      "Forecast revenue for next month based on current trends": `
+📈 Revenue Forecast (Next Month)
+
+Projected Revenue: $372,400 ± $15,200
+Compared to Current Month: +8.3%
+
+Confidence Level: High (92%)
+
+Forecast Breakdown:
+- Subscription Revenue: $218,600 (↑9.2%)
+- One-time Purchases: $96,800 (↑6.5%)
+- Professional Services: $57,000 (↑8.8%)
+
+🔍 Influencing Factors:
+- Seasonal uptick in business spending (positive)
+- New product launch impact (positive)
+- Market volatility indicator (neutral)
+
+Would you like to adjust any assumptions in this forecast model?
+      `
+    };
+    
+    // Default response if none of the sample queries
+    let result = `
+📊 Analysis Results
+
+Based on your query: "${query}"
+
+I've analyzed the available data and found the following insights:
+- Overall positive trend in the requested metrics
+- Several outliers that may require further investigation
+- Opportunity for 12-15% improvement based on historical patterns
+
+Would you like me to generate a more detailed report or visualization?
+    `;
+    
+    // Check if the query matches or contains key phrases from our sample queries
+    for (const sampleQuery of Object.keys(salesData)) {
+      if (query.toLowerCase().includes(sampleQuery.toLowerCase()) || 
+          sampleQuery.toLowerCase().includes(query.toLowerCase())) {
+        result = salesData[sampleQuery];
+        break;
+      }
+    }
+    
+    return result;
+  };
+  
+  // Generate workflow steps for the selected scenario
+  const generateWorkflowSteps = (scenario: string) => {
+    const workflowsMap = {
+      "Client onboarding process with document collection and welcome emails": [
+        "Configure document request trigger when new client signs up",
+        "Create automated email requesting necessary documents",
+        "Setup document upload portal with auto-categorization",
+        "Implement AI verification to check document completeness",
+        "Generate personalized welcome sequence based on client type",
+        "Schedule automatic follow-ups for missing documents",
+        "Create integration with CRM to update client status"
+      ],
+      
+      "Expense reporting workflow with receipt processing and approval routing": [
+        "Configure receipt capture via mobile app or email",
+        "Setup AI receipt parser to extract merchant, date, amount and category",
+        "Create expense categorization rules with accounting code mapping",
+        "Implement approval routing based on amount thresholds and departments",
+        "Generate expense reports with automatic currency conversion",
+        "Create integration with accounting software for reimbursement",
+        "Setup automatic reminders for approvers and submitters"
+      ],
+      
+      "Content publishing workflow with review, approval and scheduling steps": [
+        "Create content calendar with automated assignment notifications",
+        "Implement draft submission process with version tracking",
+        "Setup review routing with role-based permissions",
+        "Create approval workflow with edit request functionality",
+        "Implement content scheduling with platform-specific formatting",
+        "Setup automated social media post generation from approved content",
+        "Configure analytics tracking and performance reporting"
+      ]
+    };
+    
+    // Return the workflow steps for the selected scenario
+    return workflowsMap[scenario] || [];
+  };
+  
+  // Handle running a data analysis query
+  const handleRunQuery = () => {
+    if (!userQuery.trim()) return;
+    
+    setIsGenerating(true);
+    
+    // Simulate processing time
+    setTimeout(() => {
+      const result = generateVisualization(userQuery);
+      
+      // Add the query and result to the results array
+      setResults(prev => [...prev, { query: userQuery, result }]);
+      
+      // Add to completed queries
+      setCompletedQueries(prev => [...prev, userQuery]);
+      
+      // Clear the input
+      setUserQuery('');
+      
+      // Mark as complete after 3 queries
+      if (completedQueries.length >= 2) {
+        setExerciseComplete(true);
       }
       
-      setResults(mockResults);
-      setIsLoading(false);
-      setStepCompleted(true);
+      setIsGenerating(false);
     }, 1500);
   };
-
-  const handleNextStep = () => {
-    if (currentStep < totalSteps) {
-      setCurrentStep(prev => prev + 1);
-      setStepCompleted(false);
-    } else {
-      onComplete();
-    }
+  
+  // Handle selecting a predefined query
+  const handleSelectQuery = (query: string) => {
+    setUserQuery(query);
   };
-
-  const getStepContent = (step: number) => {
-    if (isWorkflowAutomation) {
-      switch (step) {
-        case 1:
-          return {
-            title: 'Step 1: Identify Trigger Event',
-            description: 'Select what starts your automation workflow',
-            options: [
-              'New form submission',
-              'Document uploaded',
-              'Scheduled time/date',
-              'Manual trigger button'
-            ]
-          };
-        case 2:
-          return {
-            title: 'Step 2: Add Processing Steps',
-            description: 'Select what happens during your workflow',
-            options: [
-              'Extract data from document',
-              'Send notification/email',
-              'Update database record',
-              'Generate report'
-            ]
-          };
-        case 3:
-          return {
-            title: 'Step 3: Define Completion Actions',
-            description: 'Select how your workflow concludes',
-            options: [
-              'Send confirmation message',
-              'Update dashboard',
-              'Schedule follow-up task',
-              'Generate completion report'
-            ]
-          };
-        default:
-          return { title: '', description: '', options: [] };
-      }
-    }
+  
+  // Handle selecting a workflow scenario
+  const handleSelectScenario = (scenario: string) => {
+    setSelectedScenario(scenario);
+    const steps = generateWorkflowSteps(scenario);
+    setWorkflowSteps(steps);
     
-    return { title: '', description: '', options: [] };
+    // Mark as complete after selecting a scenario and seeing the steps
+    setTimeout(() => {
+      setExerciseComplete(true);
+    }, 500);
   };
-
-  const handleStepSelection = (option: string) => {
-    // In a real app, this would actually build the workflow
-    setStepCompleted(true);
+  
+  // Handle completion of the exercise
+  const handleComplete = () => {
+    onComplete();
   };
-
-  const renderWorkflowBuilder = () => {
-    const stepContent = getStepContent(currentStep);
-    
+  
+  // Completed exercise view
+  if (exerciseComplete && activeTab === 'results') {
     return (
-      <div className="mb-6">
-        <div className="flex items-center space-x-2 mb-6">
-          {Array.from({ length: totalSteps }).map((_, index) => (
-            <React.Fragment key={index}>
-              <div 
-                className={`w-8 h-8 rounded-full flex items-center justify-center 
-                  ${currentStep > index + 1 
-                    ? 'bg-accent-teal text-white' 
-                    : currentStep === index + 1 
-                      ? 'bg-accent-teal/20 border border-accent-teal text-accent-teal' 
-                      : 'bg-muted text-muted-foreground'
-                  }`}
-              >
-                {currentStep > index + 1 ? <CheckCircle size={16} /> : index + 1}
-              </div>
-              {index < totalSteps - 1 && (
-                <div 
-                  className={`h-1 w-10 ${
-                    currentStep > index + 1 ? 'bg-accent-teal' : 'bg-muted'
-                  }`}
-                />
-              )}
-            </React.Fragment>
-          ))}
-        </div>
-        
-        <h3 className="text-lg font-medium mb-2">{stepContent.title}</h3>
-        <p className="text-muted-foreground mb-4">{stepContent.description}</p>
-        
-        <div className="grid gap-3 sm:grid-cols-2">
-          {stepContent.options.map((option, index) => (
-            <Card 
-              key={index}
-              className={`p-4 cursor-pointer hover:bg-muted/50 transition-colors ${
-                stepCompleted && index === 0 ? 'border-accent-teal bg-accent-teal/10' : ''
-              }`}
-              onClick={() => handleStepSelection(option)}
-            >
-              {option}
-            </Card>
-          ))}
-        </div>
-        
-        <div className="flex justify-end mt-6">
-          <Button
-            onClick={handleNextStep}
-            disabled={!stepCompleted}
-            className="bg-accent-teal hover:bg-accent-teal/90"
-          >
-            {currentStep < totalSteps ? (
-              <>Next <ArrowRight size={16} className="ml-2" /></>
-            ) : (
-              'Complete Workflow'
-            )}
-          </Button>
-        </div>
-      </div>
-    );
-  };
-
-  // Render for Data Analysis Exercise
-  if (isDataAnalysis) {
-    return (
-      <div>
-        <h3 className="font-semibold mb-2">{title}</h3>
-        <p className="text-muted-foreground mb-6">{description}</p>
-        
-        {stepCompleted && results ? (
-          <div>
-            <div className="mb-6">
-              <h4 className="font-medium mb-2">Results for: "{userQuery}"</h4>
-              <div className="bg-muted rounded-lg p-4">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-border">
-                      {Object.keys(results[0]).map((key, i) => (
-                        <th key={i} className="text-left p-2">{key.charAt(0).toUpperCase() + key.slice(1)}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {results.map((row, i) => (
-                      <tr key={i} className="border-b border-border/40">
-                        {Object.values(row).map((value, j) => (
-                          <td key={j} className="p-2">{value as React.ReactNode}</td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              
-              <div className="flex justify-between mt-6">
-                <Button 
-                  variant="outline" 
-                  onClick={() => {
-                    setResults(null);
-                    setStepCompleted(false);
-                  }}
-                >
-                  Try Another Query
-                </Button>
-                <Button 
-                  onClick={onComplete}
-                  className="bg-accent-teal hover:bg-accent-teal/90"
-                >
-                  Complete Exercise
-                </Button>
-              </div>
-            </div>
+      <div className="text-center animate-fade-in">
+        <div className="mb-6">
+          <div className="inline-block p-4 bg-accent-teal/20 rounded-full mb-3">
+            <Award className="h-8 w-8 text-accent-teal" />
           </div>
-        ) : (
-          <div>
-            <div className="mb-4">
-              <h4 className="font-medium mb-2">Try asking a question about your data:</h4>
-              <div className="flex mb-2">
-                <Input 
-                  value={userQuery}
-                  onChange={(e) => setUserQuery(e.target.value)}
-                  placeholder="Ask a question about your data..."
-                  className="flex-1 mr-2"
-                />
-                <Button 
-                  onClick={handleDataQuery}
-                  disabled={isLoading || !userQuery}
-                  className="bg-accent-teal hover:bg-accent-teal/90"
-                >
-                  <Search size={16} className="mr-2" />
-                  {isLoading ? 'Analyzing...' : 'Analyze'}
-                </Button>
+          <h3 className="text-xl font-bold mb-2">Exercise Completed!</h3>
+          <p className="text-muted-foreground mb-4">
+            You've successfully practiced {sampleQueries ? 'data analysis using natural language' : 'workflow automation'}.
+          </p>
+          
+          <div className="mb-4">
+            <div className="font-medium text-sm mb-1">Productivity Improvement</div>
+            <Progress value={90} className="h-2 mb-1" />
+            <p className="text-xs text-muted-foreground">Estimated time saved: {sampleQueries ? '75 minutes' : '4.5 hours'} per week</p>
+          </div>
+        </div>
+        
+        <div className="space-y-3 mb-6 text-left">
+          <h4 className="font-medium">Key Skills Acquired:</h4>
+          
+          {sampleQueries ? (
+            <div className="space-y-2">
+              <div className="flex items-start gap-2 p-3 bg-muted/50 rounded-lg">
+                <CheckCircle2 className="h-5 w-5 text-accent-teal mt-0.5" />
+                <div>
+                  <p className="font-medium">Natural Language Data Analysis</p>
+                  <p className="text-sm text-muted-foreground">Ask questions about your data in plain language</p>
+                </div>
               </div>
-              
-              <div className="mb-6">
-                <h4 className="text-sm text-muted-foreground mb-2">Sample queries:</h4>
-                <div className="flex flex-wrap gap-2">
-                  {data.sampleQueries?.map((query, index) => (
-                    <Button 
-                      key={index} 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => handleSampleQuerySelect(query)}
-                    >
-                      {query}
-                    </Button>
-                  ))}
+              <div className="flex items-start gap-2 p-3 bg-muted/50 rounded-lg">
+                <CheckCircle2 className="h-5 w-5 text-accent-teal mt-0.5" />
+                <div>
+                  <p className="font-medium">Insight Extraction</p>
+                  <p className="text-sm text-muted-foreground">Quickly identify patterns and anomalies in complex datasets</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2 p-3 bg-muted/50 rounded-lg">
+                <CheckCircle2 className="h-5 w-5 text-accent-teal mt-0.5" />
+                <div>
+                  <p className="font-medium">Forecasting and Prediction</p>
+                  <p className="text-sm text-muted-foreground">Use AI to generate forward-looking projections</p>
                 </div>
               </div>
             </div>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  // Render for Workflow Automation Exercise
-  if (isWorkflowAutomation) {
-    return (
-      <div>
-        <h3 className="font-semibold mb-2">{title}</h3>
-        <p className="text-muted-foreground mb-6">{description}</p>
+          ) : (
+            <div className="space-y-2">
+              <div className="flex items-start gap-2 p-3 bg-muted/50 rounded-lg">
+                <CheckCircle2 className="h-5 w-5 text-accent-teal mt-0.5" />
+                <div>
+                  <p className="font-medium">Automation Design</p>
+                  <p className="text-sm text-muted-foreground">Create efficient workflows for repetitive business processes</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2 p-3 bg-muted/50 rounded-lg">
+                <CheckCircle2 className="h-5 w-5 text-accent-teal mt-0.5" />
+                <div>
+                  <p className="font-medium">Process Optimization</p>
+                  <p className="text-sm text-muted-foreground">Identify and eliminate manual steps that can be automated</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2 p-3 bg-muted/50 rounded-lg">
+                <CheckCircle2 className="h-5 w-5 text-accent-teal mt-0.5" />
+                <div>
+                  <p className="font-medium">Integration Planning</p>
+                  <p className="text-sm text-muted-foreground">Connect different systems for seamless data flow</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
         
-        {!activeScenario ? (
-          <div className="mb-6">
-            <h4 className="font-medium mb-3">Select a scenario to automate:</h4>
-            <div className="space-y-3">
-              {data.scenarios?.map((scenario, index) => (
-                <Card 
-                  key={index} 
-                  className="p-4 cursor-pointer hover:bg-muted/50 transition-colors"
-                  onClick={() => handleScenarioSelect(scenario)}
-                >
-                  <div className="flex items-start">
-                    <div className="bg-accent-teal/20 p-2 rounded-full mr-3">
-                      <Zap size={16} className="text-accent-teal" />
-                    </div>
-                    <div>
-                      <h5 className="font-medium">{scenario}</h5>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div>
-            <div className="mb-6 p-4 bg-muted/50 rounded-lg">
-              <h4 className="font-medium">Automating: {activeScenario}</h4>
-            </div>
-            
-            {renderWorkflowBuilder()}
-          </div>
-        )}
+        <Button 
+          onClick={handleComplete}
+          className="bg-accent-teal hover:bg-accent-teal/90"
+        >
+          Continue Learning
+        </Button>
       </div>
     );
   }
-
-  // Fallback
+  
   return (
     <div>
-      <h3 className="font-semibold mb-2">{title}</h3>
-      <p className="text-muted-foreground mb-6">{description}</p>
-      <div className="text-center py-6">
-        <p>Exercise not available</p>
-        <Button onClick={onComplete} className="mt-4">Complete</Button>
-      </div>
+      <h3 className="text-xl font-bold mb-2">{title}</h3>
+      <p className="text-muted-foreground mb-4">{description}</p>
+      
+      <Tabs 
+        defaultValue="exercise" 
+        className="w-full" 
+        value={activeTab}
+        onValueChange={setActiveTab}
+      >
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="exercise">
+            {sampleQueries ? <BarChart3 className="w-4 h-4 mr-2" /> : <Terminal className="w-4 h-4 mr-2" />}
+            {sampleQueries ? 'Data Analysis' : 'Workflow Builder'}
+          </TabsTrigger>
+          <TabsTrigger value="results" disabled={!exerciseComplete}>
+            <BarChart className="w-4 h-4 mr-2" />
+            Results
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="exercise" className="animate-fade-in">
+          {/* Data Analysis Exercise */}
+          {sampleQueries && (
+            <div>
+              <div className="mb-4">
+                <Card className="bg-muted/30">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Database className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm font-medium">Available Data Sets</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Sales data, product inventory, customer information, financial metrics, and marketing campaign performance
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+              
+              <div className="mb-4">
+                <label className="text-sm font-medium mb-2 block">
+                  Ask a question about your data:
+                </label>
+                <div className="flex gap-2">
+                  <Input
+                    value={userQuery}
+                    onChange={(e) => setUserQuery(e.target.value)}
+                    placeholder="Example: Show me sales trends for the last quarter"
+                    className="flex-1"
+                  />
+                  <Button
+                    onClick={handleRunQuery}
+                    disabled={!userQuery.trim() || isGenerating}
+                  >
+                    {isGenerating ? (
+                      <div className="h-5 w-5 rounded-full border-2 border-t-transparent border-white animate-spin"></div>
+                    ) : (
+                      <Search className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="mb-6">
+                <div className="text-sm font-medium mb-2">Example queries:</div>
+                <div className="flex flex-wrap gap-2">
+                  {sampleQueries.map((query, index) => (
+                    <Badge 
+                      key={index} 
+                      variant={completedQueries.includes(query) ? "default" : "outline"}
+                      className="cursor-pointer"
+                      onClick={() => handleSelectQuery(query)}
+                    >
+                      {completedQueries.includes(query) && <CheckCircle2 className="h-3 w-3 mr-1" />}
+                      {query}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Results Display */}
+              {results.length > 0 && (
+                <div className="space-y-4 mt-6">
+                  <h4 className="font-medium">Analysis Results:</h4>
+                  
+                  {results.map((item, index) => (
+                    <Card key={index} className="overflow-hidden">
+                      <div className="bg-accent-teal/80 text-white p-2 text-sm">
+                        <span className="font-medium">Query:</span> {item.query}
+                      </div>
+                      <CardContent className="p-4">
+                        <pre className="whitespace-pre-wrap font-sans text-sm">{item.result}</pre>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+              
+              {exerciseComplete && (
+                <div className="mt-6 flex justify-end">
+                  <Button
+                    onClick={() => setActiveTab('results')}
+                    className="bg-accent-teal hover:bg-accent-teal/90"
+                  >
+                    View Results <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* Workflow Automation Exercise */}
+          {scenarios && (
+            <div>
+              <div className="mb-6">
+                <label className="text-sm font-medium mb-2 block">
+                  Select a workflow scenario to automate:
+                </label>
+                <div className="space-y-3">
+                  {scenarios.map((scenario, index) => (
+                    <Card 
+                      key={index} 
+                      className={`overflow-hidden cursor-pointer transition-all hover:shadow-md ${
+                        selectedScenario === scenario ? 'border-accent-teal ring-1 ring-accent-teal' : ''
+                      }`}
+                      onClick={() => handleSelectScenario(scenario)}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-start gap-3">
+                          <div className={`p-2 rounded-full ${selectedScenario === scenario ? 'bg-accent-teal/20' : 'bg-muted'}`}>
+                            <Terminal className={`h-4 w-4 ${selectedScenario === scenario ? 'text-accent-teal' : 'text-muted-foreground'}`} />
+                          </div>
+                          <div>
+                            <div className="font-medium">{scenario}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {index === 0 ? 'Difficulty: Easy' : index === 1 ? 'Difficulty: Medium' : 'Difficulty: Advanced'}
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Workflow Steps */}
+              {selectedScenario && workflowSteps.length > 0 && (
+                <div className="mt-6">
+                  <h4 className="font-medium mb-4">AI-Generated Workflow:</h4>
+                  
+                  <div className="space-y-3 ml-4 relative before:absolute before:left-1.5 before:top-1 before:h-full before:w-0.5 before:bg-muted">
+                    {workflowSteps.map((step, index) => (
+                      <div key={index} className="flex items-start gap-3 pl-6 relative">
+                        <div className="absolute left-0 top-1.5 w-3 h-3 rounded-full bg-accent-teal z-10"></div>
+                        <div className="p-3 bg-muted/50 rounded-lg w-full">
+                          <div className="flex justify-between">
+                            <div className="font-medium">Step {index + 1}</div>
+                            <Badge variant="outline" className="text-xs">
+                              {index < 3 ? 'Simple' : index < 5 ? 'Moderate' : 'Advanced'}
+                            </Badge>
+                          </div>
+                          <p className="text-sm mt-1">{step}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="mt-6 flex justify-end">
+                    <Button
+                      onClick={() => setActiveTab('results')}
+                      className="bg-accent-teal hover:bg-accent-teal/90"
+                    >
+                      Complete Exercise <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </TabsContent>
+        
+        <TabsContent value="results" className="animate-fade-in">
+          <div className="text-center">
+            <div className="mb-6">
+              <div className="inline-block p-4 bg-accent-teal/20 rounded-full mb-3">
+                <Award className="h-8 w-8 text-accent-teal" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">Exercise Completed!</h3>
+              <p className="text-muted-foreground mb-4">
+                You've successfully practiced {sampleQueries ? 'data analysis using natural language' : 'workflow automation'}.
+              </p>
+              
+              <div className="mb-4">
+                <div className="font-medium text-sm mb-1">Productivity Improvement</div>
+                <Progress value={90} className="h-2 mb-1" />
+                <p className="text-xs text-muted-foreground">Estimated time saved: {sampleQueries ? '75 minutes' : '4.5 hours'} per week</p>
+              </div>
+            </div>
+            
+            <div className="space-y-3 mb-6 text-left">
+              <h4 className="font-medium">Key Skills Acquired:</h4>
+              
+              {sampleQueries ? (
+                <div className="space-y-2">
+                  <div className="flex items-start gap-2 p-3 bg-muted/50 rounded-lg">
+                    <CheckCircle2 className="h-5 w-5 text-accent-teal mt-0.5" />
+                    <div>
+                      <p className="font-medium">Natural Language Data Analysis</p>
+                      <p className="text-sm text-muted-foreground">Ask questions about your data in plain language</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2 p-3 bg-muted/50 rounded-lg">
+                    <CheckCircle2 className="h-5 w-5 text-accent-teal mt-0.5" />
+                    <div>
+                      <p className="font-medium">Insight Extraction</p>
+                      <p className="text-sm text-muted-foreground">Quickly identify patterns and anomalies in complex datasets</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2 p-3 bg-muted/50 rounded-lg">
+                    <CheckCircle2 className="h-5 w-5 text-accent-teal mt-0.5" />
+                    <div>
+                      <p className="font-medium">Forecasting and Prediction</p>
+                      <p className="text-sm text-muted-foreground">Use AI to generate forward-looking projections</p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <div className="flex items-start gap-2 p-3 bg-muted/50 rounded-lg">
+                    <CheckCircle2 className="h-5 w-5 text-accent-teal mt-0.5" />
+                    <div>
+                      <p className="font-medium">Automation Design</p>
+                      <p className="text-sm text-muted-foreground">Create efficient workflows for repetitive business processes</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2 p-3 bg-muted/50 rounded-lg">
+                    <CheckCircle2 className="h-5 w-5 text-accent-teal mt-0.5" />
+                    <div>
+                      <p className="font-medium">Process Optimization</p>
+                      <p className="text-sm text-muted-foreground">Identify and eliminate manual steps that can be automated</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2 p-3 bg-muted/50 rounded-lg">
+                    <CheckCircle2 className="h-5 w-5 text-accent-teal mt-0.5" />
+                    <div>
+                      <p className="font-medium">Integration Planning</p>
+                      <p className="text-sm text-muted-foreground">Connect different systems for seamless data flow</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <Button 
+              onClick={handleComplete}
+              className="bg-accent-teal hover:bg-accent-teal/90"
+            >
+              Continue Learning
+            </Button>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

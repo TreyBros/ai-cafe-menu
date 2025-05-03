@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Caveat:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -36,11 +36,11 @@
 
     --radius: 0.5rem;
 
-    --coffee-dark: 28 28% 19%;
-    --coffee-medium: 28 23% 35%;
-    --coffee-light: 28 22% 50%;
-    --coffee-cream: 36 56% 90%;
-    --accent-teal: 174 75% 37%;
+    --coffee-dark: 213 70% 22%;
+    --coffee-medium: 196 64% 29%;
+    --coffee-light: 174 50% 56%;
+    --coffee-cream: 198 100% 94%;
+    --accent-teal: 204 100% 57%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -99,6 +99,7 @@
 
   body {
     @apply bg-background text-foreground font-sans;
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2357C5B6' fill-opacity='0.05'%3E%3Ccircle cx='50' cy='50' r='20'/%3E%3Ccircle cx='0' cy='0' r='15'/%3E%3Ccircle cx='100' cy='0' r='15'/%3E%3Ccircle cx='100' cy='100' r='15'/%3E%3Ccircle cx='0' cy='100' r='15'/%3E%3C/g%3E%3C/svg%3E");
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -108,15 +109,116 @@
 
 .menu-card {
   @apply bg-card rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300;
+  position: relative;
+  overflow: hidden;
+}
+
+.menu-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, transparent 48%, rgba(var(--coffee-medium), 0.1) 50%, transparent 52%);
+  z-index: 1;
+}
+
+.menu-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(var(--coffee-dark), 0.1);
+}
+
+.chalk-text {
+  font-family: 'Caveat', cursive;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+.chalkboard {
+  background-color: #0F3460;
+  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.chalkboard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+    radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 10px 10px;
+  background-position: 0 0, 5px 5px;
+  pointer-events: none;
+}
+
+.coffee-stain {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(26, 95, 122, 0.2) 0%, rgba(26, 95, 122, 0.15) 50%, rgba(26, 95, 122, 0) 100%);
+  transform: scale(1.5, 1);
+  opacity: 0.4;
+  z-index: 0;
 }
 
 .steam {
   @apply absolute -top-4 w-6 h-6 rounded-full bg-white/30 animate-steam;
 }
 
+.coffee-cup {
+  position: relative;
+  width: 40px;
+  height: 32px;
+  background-color: hsl(var(--coffee-medium));
+  border-radius: 0 0 20px 20px;
+  margin: 0 auto;
+}
+
+.coffee-cup::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -10px;
+  width: 15px;
+  height: 15px;
+  border: 3px solid hsl(var(--coffee-medium));
+  border-radius: 50%;
+  border-top-left-radius: 0;
+}
+
+.coffee-cup::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  background-color: hsl(var(--coffee-light));
+  border-radius: 10px;
+}
+
+.coffee-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: hsl(var(--accent-teal));
+  border-radius: 0 0 20px 20px;
+  transition: all 0.5s ease;
+}
+
 @layer components {
   .font-cafe {
     font-family: 'Poppins', sans-serif;
+  }
+  
+  .font-chalk {
+    font-family: 'Caveat', cursive;
   }
   
   .steam {
@@ -151,6 +253,32 @@
       opacity: 0;
     }
   }
+  
+  .animate-pour {
+    animation: pourCoffee 2s ease-out forwards;
+  }
+  
+  @keyframes pourCoffee {
+    0% {
+      height: 0;
+    }
+    100% {
+      height: 80%;
+    }
+  }
+  
+  .animate-bubble {
+    animation: bubble 1.5s ease-in-out infinite;
+  }
+  
+  @keyframes bubble {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
 }
 
 @layer utilities {
@@ -160,6 +288,18 @@
   
   .animate-fade-in-up {
     animation: fadeInUp 0.5s ease-out forwards;
+  }
+  
+  .animate-slide-in-right {
+    animation: slideInRight 0.5s ease-out forwards;
+  }
+  
+  .animate-bounce-in {
+    animation: bounceIn 0.8s cubic-bezier(0.215, 0.610, 0.355, 1.000) forwards;
+  }
+  
+  .animate-chalk-write {
+    animation: chalkWrite 1.5s linear forwards;
   }
   
   @keyframes fadeIn {
@@ -182,10 +322,59 @@
     }
   }
   
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  @keyframes bounceIn {
+    0% {
+      opacity: 0;
+      transform: scale(0.3);
+    }
+    20% {
+      transform: scale(1.1);
+    }
+    40% {
+      transform: scale(0.9);
+    }
+    60% {
+      opacity: 1;
+      transform: scale(1.03);
+    }
+    80% {
+      transform: scale(0.97);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  @keyframes chalkWrite {
+    0% {
+      stroke-dashoffset: 1000;
+    }
+    100% {
+      stroke-dashoffset: 0;
+    }
+  }
+  
   .bg-grid-pattern {
     background-image: 
       linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px);
     background-size: 20px 20px;
+  }
+  
+  .bg-coffee-paper {
+    background-color: hsl(var(--coffee-cream));
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2357C5B6' fill-opacity='0.1'%3E%3Ccircle cx='50' cy='50' r='20'/%3E%3Ccircle cx='0' cy='0' r='15'/%3E%3Ccircle cx='100' cy='0' r='15'/%3E%3Ccircle cx='100' cy='100' r='15'/%3E%3Ccircle cx='0' cy='100' r='15'/%3E%3C/g%3E%3C/svg%3E");
   }
 }
