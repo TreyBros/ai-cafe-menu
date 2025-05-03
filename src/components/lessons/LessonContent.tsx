@@ -62,13 +62,13 @@ const LessonContent: React.FC<LessonContentProps> = ({ lesson }) => {
       
       <Card className="mb-6">
         <CardContent className="pt-6">
-          <p className="text-lg mb-8">{lesson.content.intro}</p>
+          <p className="text-lg mb-8">{lesson.content?.intro || 'No introduction available.'}</p>
           
           {/* Key learning points */}
           <div className="mb-8">
             <h3 className="text-xl font-cafe font-semibold mb-4">Key Points</h3>
             <ul className="space-y-3">
-              {lesson.content.keyPoints.map((point, index) => (
+              {(lesson.content?.keyPoints || []).map((point, index) => (
                 <li key={index} className="flex">
                   <CheckCircle size={20} className="text-highlights-blue mr-3 mt-1 flex-shrink-0" />
                   <span>{point}</span>
@@ -78,7 +78,7 @@ const LessonContent: React.FC<LessonContentProps> = ({ lesson }) => {
           </div>
           
           {/* Interactive element placeholder */}
-          {lesson.content.interactiveElement && (
+          {lesson.content?.interactiveElement && (
             <div className="mb-8">
               <h3 className="text-xl font-cafe font-semibold mb-4">Interactive Experience</h3>
               <div className="bg-muted p-6 rounded-lg text-center">
@@ -95,7 +95,7 @@ const LessonContent: React.FC<LessonContentProps> = ({ lesson }) => {
           {/* Summary */}
           <div className="mb-6">
             <h3 className="text-xl font-cafe font-semibold mb-4">Summary</h3>
-            <p>{lesson.content.summary}</p>
+            <p>{lesson.content?.summary || 'No summary available.'}</p>
           </div>
         </CardContent>
       </Card>
