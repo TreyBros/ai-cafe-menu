@@ -24,8 +24,8 @@ const LessonContent: React.FC<LessonContentProps> = ({ lesson }) => {
       id: lesson.id,
       title: lesson.title,
       category: lesson.category,
-      price: lesson.price,  // Ensure price property is included
-      image: lesson.image   // Ensure image property is included
+      price: lesson.price,
+      image: lesson.image
     });
     
     toast({
@@ -38,6 +38,12 @@ const LessonContent: React.FC<LessonContentProps> = ({ lesson }) => {
       navigate('/');
     }, 3000);
   };
+
+  // Safely access nested properties with fallbacks
+  const keyPoints = lesson.content?.keyPoints || [];
+  const interactiveElement = lesson.content?.interactiveElement;
+  const summary = lesson.content?.summary;
+  const intro = lesson.content?.intro || "No content available";
   
   return (
     <div className="animate-fade-in">
@@ -62,14 +68,14 @@ const LessonContent: React.FC<LessonContentProps> = ({ lesson }) => {
       
       <Card className="mb-6 border-blue-light/20 shadow-glow">
         <CardContent className="pt-6">
-          <p className="text-lg mb-8">{lesson.content?.intro || "No content available"}</p>
+          <p className="text-lg mb-8">{intro}</p>
           
           {/* Key learning points */}
-          {lesson.content?.keyPoints && lesson.content.keyPoints.length > 0 && (
+          {keyPoints.length > 0 && (
             <div className="mb-8">
               <h3 className="text-xl font-cafe font-semibold mb-4">Key Points</h3>
               <ul className="space-y-3">
-                {lesson.content.keyPoints.map((point, index) => (
+                {keyPoints.map((point, index) => (
                   <li key={index} className="flex">
                     <CheckCircle size={20} className="text-highlights-blue mr-3 mt-1 flex-shrink-0" />
                     <span>{point}</span>
@@ -80,14 +86,14 @@ const LessonContent: React.FC<LessonContentProps> = ({ lesson }) => {
           )}
           
           {/* Interactive element placeholder */}
-          {lesson.content?.interactiveElement && (
+          {interactiveElement && (
             <div className="mb-8">
               <h3 className="text-xl font-cafe font-semibold mb-4">Interactive Experience</h3>
               <div className="bg-blue-pale/30 dark:bg-blue-light/5 p-6 rounded-lg text-center border border-blue-light/20">
                 <p className="text-muted-foreground mb-3">
-                  {typeof lesson.content.interactiveElement === 'string' 
-                    ? lesson.content.interactiveElement 
-                    : lesson.content.interactiveElement.description || "Interactive content"}
+                  {typeof interactiveElement === 'string' 
+                    ? interactiveElement 
+                    : interactiveElement.description || "Interactive content"}
                 </p>
                 <Button variant="outline" disabled className="border-blue-light/30 text-blue-dark dark:text-blue-light">Coming Soon</Button>
               </div>
@@ -95,10 +101,10 @@ const LessonContent: React.FC<LessonContentProps> = ({ lesson }) => {
           )}
           
           {/* Summary */}
-          {lesson.content?.summary && (
+          {summary && (
             <div className="mb-6">
               <h3 className="text-xl font-cafe font-semibold mb-4">Summary</h3>
-              <p>{lesson.content.summary}</p>
+              <p>{summary}</p>
             </div>
           )}
         </CardContent>
