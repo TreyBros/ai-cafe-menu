@@ -189,20 +189,22 @@ export const useSessionStore = create<SessionStore>()(
       
       getReceipt: () => {
         const state = get();
-        const session = state.session;
+        const session = state.session || createInitialSession(); // Ensure we have a valid session
+        
+        // Safely handle potentially undefined values
+        const completedItems = session.completedItems || [];
+        const selectedCoffees = session.selectedCoffees || [];
+        const skillsAcquired = session.skillsAcquired || [];
         
         // Calculate learning stats
         const categoriesCompleted = [
-          ...new Set(session.completedItems.map(item => item.category))
+          ...new Set((completedItems || []).map(item => item.category))
         ];
-        
-        // Get unique skills
-        const uniqueSkills = [...new Set(session.skillsAcquired)];
         
         // Calculate order total
         const orderTotal = [
-          ...session.completedItems,
-          ...session.selectedCoffees
+          ...completedItems,
+          ...selectedCoffees
         ].reduce((total, item) => {
           const price = (item.price || "$0.00").replace('$', '');
           return total + parseFloat(price);
@@ -213,17 +215,17 @@ export const useSessionStore = create<SessionStore>()(
           customerName: session.userName || "Valued Customer",
           date: new Date().toLocaleDateString(),
           time: new Date().toLocaleTimeString(),
-          items: session.completedItems,
-          coffees: session.selectedCoffees,
-          completedOrders: session.completedOrders,
-          notes: session.userNotes,
-          skills: uniqueSkills,
+          items: completedItems,
+          coffees: selectedCoffees,
+          completedOrders: session.completedOrders || [],
+          notes: session.userNotes || [],
+          skills: [...new Set(skillsAcquired)],
           stats: {
-            timeSpentMinutes: session.totalTimeSpent,
+            timeSpentMinutes: session.totalTimeSpent || 0,
             categoriesCompleted: categoriesCompleted.length,
             categoriesList: categoriesCompleted,
-            totalItems: session.completedItems.length,
-            totalCoffees: session.selectedCoffees.length
+            totalItems: completedItems.length,
+            totalCoffees: selectedCoffees.length
           },
           pricing: {
             subtotal: orderTotal.toFixed(2),

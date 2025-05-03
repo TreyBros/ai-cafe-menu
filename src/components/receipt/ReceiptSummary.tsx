@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useSessionStore } from '@/stores/sessionStore';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,6 +14,9 @@ const ReceiptSummary: React.FC = () => {
   const { toast } = useToast();
   
   const receipt = getReceipt();
+  
+  // Safely handle potential undefined values
+  const completedItems = session?.completedItems || [];
   
   const handleSendEmail = () => {
     if (!emailInput || !emailInput.includes('@')) {
@@ -64,9 +68,9 @@ const ReceiptSummary: React.FC = () => {
         <div className="mb-6">
           <h3 className="text-lg font-cafe font-semibold mb-3">Your Learning Journey</h3>
           
-          {session.completedItems.length > 0 ? (
+          {completedItems.length > 0 ? (
             <ul className="space-y-3">
-              {session.completedItems.map((item, index) => (
+              {completedItems.map((item, index) => (
                 <li key={index} className="flex items-center">
                   <CheckCircle size={18} className="text-highlights-blue mr-2" />
                   <span>{item.title}</span>
@@ -86,17 +90,17 @@ const ReceiptSummary: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-muted p-4 rounded-lg text-center">
               <Clock size={18} className="mx-auto mb-1" />
-              <p className="text-2xl font-bold">{receipt.stats.timeSpentMinutes} min</p>
+              <p className="text-2xl font-bold">{receipt.stats?.timeSpentMinutes || 0} min</p>
               <p className="text-sm text-muted-foreground">Time Spent</p>
             </div>
             <div className="bg-muted p-4 rounded-lg text-center">
               <Coffee size={18} className="mx-auto mb-1" />
-              <p className="text-2xl font-bold">{receipt.stats.totalItems}</p>
+              <p className="text-2xl font-bold">{receipt.stats?.totalItems || 0}</p>
               <p className="text-sm text-muted-foreground">Items Completed</p>
             </div>
             <div className="bg-muted p-4 rounded-lg text-center">
               <CheckCircle size={18} className="mx-auto mb-1" />
-              <p className="text-2xl font-bold">{receipt.stats.categoriesCompleted}/3</p>
+              <p className="text-2xl font-bold">{receipt.stats?.categoriesCompleted || 0}/3</p>
               <p className="text-sm text-muted-foreground">Categories Explored</p>
             </div>
           </div>
@@ -131,7 +135,7 @@ const ReceiptSummary: React.FC = () => {
       
       <CardFooter className="flex justify-between border-t border-border pt-4">
         <div className="text-sm text-muted-foreground">
-          Session ID: {receipt.sessionId.substring(0, 8)}...
+          Session ID: {receipt.sessionId ? receipt.sessionId.substring(0, 8) + '...' : 'N/A'}
         </div>
         <Button variant="ghost" onClick={handleNewSession}>Start New Session</Button>
       </CardFooter>

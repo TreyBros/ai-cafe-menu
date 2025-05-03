@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -110,6 +111,9 @@ const CategoryPage: React.FC = () => {
     }
   };
   
+  // Safely get the userName from session
+  const userName = session?.userName || '';
+  
   return (
     <TabletLayout
       currentStep={2}
@@ -123,7 +127,7 @@ const CategoryPage: React.FC = () => {
             Choose a Menu Category
           </h1>
           <p className="text-slate-600">
-            Select a category to explore our premium AI learning options, {session.userName}
+            Select a category to explore our premium AI learning options{userName ? `, ${userName}` : ''}
           </p>
         </div>
         
@@ -159,4 +163,4 @@ const CategoryPage: React.FC = () => {
   );
 };
 
-export default CategoryPage; 
+export default CategoryPage;

@@ -97,8 +97,15 @@ const Index = () => {
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   
   const { session, setUserName: storeSetUserName, addCoffeeToSelection } = useSessionStore();
-  const hasCompletedItems = session.completedItems.length > 0;
-  const hasOrder = session.currentOrder.length > 0 || session.completedOrders.length > 0;
+  
+  // Safely handle potentially undefined session properties
+  const completedItems = session?.completedItems || [];
+  const currentOrder = session?.currentOrder || [];
+  const completedOrders = session?.completedOrders || [];
+  const selectedCoffees = session?.selectedCoffees || [];
+  
+  const hasCompletedItems = completedItems.length > 0;
+  const hasOrder = currentOrder.length > 0 || completedOrders.length > 0;
   
   // Track scroll position for animations
   useEffect(() => {
@@ -112,7 +119,7 @@ const Index = () => {
   
   // Load coffee items into state if not already there
   useEffect(() => {
-    if (session.selectedCoffees.length === 0) {
+    if (selectedCoffees.length === 0) {
       // Add some coffee items to the store
       coffeeItems.forEach(coffee => {
         addCoffeeToSelection({
@@ -123,7 +130,7 @@ const Index = () => {
         });
       });
     }
-  }, [session.selectedCoffees.length, addCoffeeToSelection]);
+  }, [selectedCoffees.length, addCoffeeToSelection]);
   
   // Rotate testimonials
   useEffect(() => {
