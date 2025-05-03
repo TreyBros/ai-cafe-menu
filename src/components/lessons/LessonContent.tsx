@@ -23,7 +23,9 @@ const LessonContent: React.FC<LessonContentProps> = ({ lesson }) => {
     addCompletedItem({
       id: lesson.id,
       title: lesson.title,
-      category: lesson.category
+      category: lesson.category,
+      price: lesson.price,
+      image: lesson.image
     });
     
     toast({
@@ -39,10 +41,22 @@ const LessonContent: React.FC<LessonContentProps> = ({ lesson }) => {
   
   // Safely access lesson content properties with fallbacks
   const content = lesson.content || {};
-  const intro = content.intro || "No introduction available for this lesson.";
-  const keyPoints = content.keyPoints || [];
-  const interactiveElement = content.interactiveElement;
-  const summary = content.summary || "No summary available for this lesson.";
+  // We need to type guard to avoid TypeScript errors
+  const intro = typeof content === 'object' && content !== null && 'intro' in content 
+    ? content.intro as string 
+    : "No introduction available for this lesson.";
+    
+  const keyPoints = typeof content === 'object' && content !== null && 'keyPoints' in content 
+    ? content.keyPoints as string[] 
+    : [];
+    
+  const interactiveElement = typeof content === 'object' && content !== null && 'interactiveElement' in content 
+    ? content.interactiveElement as string 
+    : undefined;
+    
+  const summary = typeof content === 'object' && content !== null && 'summary' in content 
+    ? content.summary as string 
+    : "No summary available for this lesson.";
   
   return (
     <div className="animate-fade-in">
