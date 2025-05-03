@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ArrowLeft, Check, Coffee, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -23,9 +22,7 @@ const LessonContent: React.FC<LessonContentProps> = ({ lesson }) => {
     addCompletedItem({
       id: lesson.id,
       title: lesson.title,
-      category: lesson.category,
-      price: lesson.price,  // Add the required price property
-      image: lesson.image   // Add the image property for consistency
+      category: lesson.category
     });
     
     toast({
@@ -62,13 +59,13 @@ const LessonContent: React.FC<LessonContentProps> = ({ lesson }) => {
       
       <Card className="mb-6">
         <CardContent className="pt-6">
-          <p className="text-lg mb-8">{lesson.content?.intro || 'No introduction available.'}</p>
+          <p className="text-lg mb-8">{lesson.content.intro}</p>
           
           {/* Key learning points */}
           <div className="mb-8">
             <h3 className="text-xl font-cafe font-semibold mb-4">Key Points</h3>
             <ul className="space-y-3">
-              {(lesson.content?.keyPoints || []).map((point, index) => (
+              {lesson.content.keyPoints.map((point, index) => (
                 <li key={index} className="flex">
                   <CheckCircle size={20} className="text-highlights-blue mr-3 mt-1 flex-shrink-0" />
                   <span>{point}</span>
@@ -78,14 +75,12 @@ const LessonContent: React.FC<LessonContentProps> = ({ lesson }) => {
           </div>
           
           {/* Interactive element placeholder */}
-          {lesson.content?.interactiveElement && (
+          {lesson.content.interactiveElement && (
             <div className="mb-8">
               <h3 className="text-xl font-cafe font-semibold mb-4">Interactive Experience</h3>
               <div className="bg-muted p-6 rounded-lg text-center">
                 <p className="text-muted-foreground mb-3">
-                  {typeof lesson.content.interactiveElement === 'string' 
-                    ? lesson.content.interactiveElement 
-                    : lesson.content.interactiveElement.description}
+                  {lesson.content.interactiveElement}
                 </p>
                 <Button variant="outline" disabled>Coming Soon</Button>
               </div>
@@ -95,7 +90,7 @@ const LessonContent: React.FC<LessonContentProps> = ({ lesson }) => {
           {/* Summary */}
           <div className="mb-6">
             <h3 className="text-xl font-cafe font-semibold mb-4">Summary</h3>
-            <p>{lesson.content?.summary || 'No summary available.'}</p>
+            <p>{lesson.content.summary}</p>
           </div>
         </CardContent>
       </Card>
