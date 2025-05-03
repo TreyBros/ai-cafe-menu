@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Coffee, Sun, Moon, Search, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -19,7 +18,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     document.documentElement.classList.toggle('dark');
     toast({
       title: `${newTheme === 'light' ? 'Light' : 'Dark'} mode activated`,
-      description: `Switched to ${newTheme} mode. Enjoy your coffee experience!`,
+      description: `Switched to ${newTheme} mode. Enjoy your learning experience!`,
       duration: 2000,
     });
   };
@@ -27,11 +26,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="bg-coffee-dark text-white p-4 shadow-md">
+      <header className="bg-blue-dark text-white p-4 shadow-md">
         <div className="container max-w-6xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-2">
             <div className="relative">
-              <Coffee size={28} className="text-coffee-cream" />
+              <Coffee size={28} className="text-blue-pale" />
               <div className="steam left-1" />
               <div className="steam left-3" style={{ animationDelay: '0.5s' }} />
             </div>
@@ -62,19 +61,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-coffee-dark text-coffee-cream p-4 text-center text-sm">
+      <footer className="bg-blue-dark text-blue-pale p-4 text-center text-sm">
         <div className="container max-w-6xl mx-auto">
           <p className="mb-2">VSP AI Café &copy; {new Date().getFullYear()}</p>
-          <p>Transforming AI learning into a delightful coffee break experience</p>
+          <p>Transforming AI learning into a delightful learning experience</p>
         </div>
       </footer>
 
       {/* Assistant Overlay (simplified for now) */}
       {showAssistant && (
-        <div className="fixed bottom-4 right-4 bg-white dark:bg-coffee-dark p-4 rounded-lg shadow-xl border border-coffee-light w-80 animate-fade-in">
+        <div className="fixed bottom-4 right-4 bg-white dark:bg-blue-dark p-4 rounded-lg shadow-xl border border-blue-light w-80 animate-fade-in">
           <div className="flex justify-between items-center mb-3">
             <div className="flex items-center gap-2">
-              <Coffee size={18} className="text-accent-teal" />
+              <Coffee size={18} className="text-highlights-blue" />
               <h3 className="font-cafe text-lg">Barista Assistant</h3>
             </div>
             <Button variant="ghost" size="sm" onClick={() => setShowAssistant(false)}>✕</Button>

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Coffee, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -11,7 +10,7 @@ const NotFound = () => {
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="text-center px-4 max-w-md">
         <div className="mb-6 inline-block">
-          <Coffee size={64} className="text-coffee-medium mx-auto" />
+          <Coffee size={64} className="text-blue-medium mx-auto" />
         </div>
         <h1 className="text-4xl font-cafe font-bold mb-4">Page Not Found</h1>
         <p className="text-xl text-muted-foreground mb-8">
@@ -19,7 +18,7 @@ const NotFound = () => {
         </p>
         <Button 
           onClick={() => navigate('/')}
-          className="bg-coffee-medium hover:bg-coffee-dark"
+          className="bg-blue-medium hover:bg-blue-dark"
           size="lg"
         >
           <ArrowLeft size={18} className="mr-2" />

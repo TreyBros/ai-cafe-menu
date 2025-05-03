@@ -1,5 +1,5 @@
-
 import type { Config } from "tailwindcss";
+import tailwindcssAnimate from "tailwindcss-animate";
 
 export default {
 	darkMode: ["class"],
@@ -25,16 +25,16 @@ export default {
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
-				coffee: {
-					dark: '#3D2314',
-					medium: '#6F4E37',
-					light: '#B38867',
-					cream: '#F5F0E1',
+				blue: {
+					dark: '#0A4B9F',
+					medium: '#0A6EDB',
+					light: '#4C9FFF',
+					pale: '#E6F0FF',
 				},
-				accent: {
-					teal: '#2A9D8F',
-					orange: '#E76F51',
-					yellow: '#F4A261',
+				highlights: {
+					blue: '#0077FF',
+					navy: '#003b80',
+					sky: '#66B2FF',
 				},
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
@@ -122,5 +122,5 @@ export default {
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [tailwindcssAnimate],
 } satisfies Config;

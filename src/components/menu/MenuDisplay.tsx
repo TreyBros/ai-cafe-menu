@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Coffee, Clock, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -18,20 +17,20 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, description, items }) 
   return (
     <div className="mb-12">
       <div className="mb-6">
-        <h2 className="text-2xl md:text-3xl font-cafe font-bold text-coffee-dark dark:text-coffee-light mb-2">{title}</h2>
+        <h2 className="text-2xl md:text-3xl font-cafe font-bold text-blue-dark dark:text-blue-light mb-2">{title}</h2>
         <p className="text-muted-foreground">{description}</p>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {items.map((item) => (
-          <Card key={item.id} className="menu-card overflow-hidden border border-coffee-light/20">
-            <div className="h-48 overflow-hidden bg-coffee-dark/10">
-              <div className="h-full bg-gradient-to-br from-coffee-light/20 to-coffee-medium/20 flex items-center justify-center">
-                <Coffee size={48} className="text-coffee-medium/60" />
+          <Card key={item.id} className="menu-card overflow-hidden border border-blue-light/20">
+            <div className="h-48 overflow-hidden bg-blue-dark/10">
+              <div className="h-full bg-gradient-to-br from-blue-light/20 to-blue-medium/20 flex items-center justify-center">
+                <Coffee size={48} className="text-blue-medium/60" />
               </div>
             </div>
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl font-cafe text-coffee-dark dark:text-coffee-light">
+              <CardTitle className="text-xl font-cafe text-blue-dark dark:text-blue-light">
                 {item.title}
               </CardTitle>
             </CardHeader>
@@ -44,7 +43,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, description, items }) 
             </CardContent>
             <CardFooter>
               <Button 
-                className="w-full bg-coffee-medium hover:bg-coffee-dark text-white"
+                className="w-full bg-blue-medium hover:bg-blue-dark text-white"
                 onClick={() => navigate(`/lesson/${item.id}`)}
               >
                 <span>Start Learning</span>

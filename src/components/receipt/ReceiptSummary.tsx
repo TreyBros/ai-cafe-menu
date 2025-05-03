@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useSessionStore } from '@/stores/sessionStore';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -50,14 +49,14 @@ const ReceiptSummary: React.FC = () => {
   };
   
   return (
-    <Card className="border border-coffee-light/20">
-      <CardHeader className="bg-coffee-dark text-white">
+    <Card className="border border-blue-light/20">
+      <CardHeader className="bg-blue-dark text-white">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Coffee size={24} />
             <CardTitle className="font-cafe text-xl">VSP AI Café Receipt</CardTitle>
           </div>
-          <div className="text-sm text-coffee-cream">{receipt.date}</div>
+          <div className="text-sm text-blue-pale">{receipt.date}</div>
         </div>
       </CardHeader>
       
@@ -69,7 +68,7 @@ const ReceiptSummary: React.FC = () => {
             <ul className="space-y-3">
               {session.completedItems.map((item, index) => (
                 <li key={index} className="flex items-center">
-                  <CheckCircle size={18} className="text-accent-teal mr-2" />
+                  <CheckCircle size={18} className="text-highlights-blue mr-2" />
                   <span>{item.title}</span>
                   <span className="ml-auto text-sm text-muted-foreground">
                     {item.category}
@@ -117,7 +116,7 @@ const ReceiptSummary: React.FC = () => {
             <Button 
               onClick={handleSendEmail} 
               disabled={isSubmitting}
-              className="bg-coffee-medium hover:bg-coffee-dark"
+              className="bg-blue-medium hover:bg-blue-dark"
             >
               <Send size={16} className="mr-2" />
               {isSubmitting ? 'Sending...' : 'Send Receipt'}

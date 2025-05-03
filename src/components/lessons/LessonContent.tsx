@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ArrowLeft, Check, Coffee, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -41,7 +40,7 @@ const LessonContent: React.FC<LessonContentProps> = ({ lesson }) => {
     <div className="animate-fade-in">
       <Button 
         variant="ghost" 
-        className="mb-6 flex items-center text-coffee-dark dark:text-coffee-light"
+        className="mb-6 flex items-center text-blue-dark dark:text-blue-light"
         onClick={() => navigate('/')}
       >
         <ArrowLeft size={16} className="mr-2" />
@@ -49,7 +48,7 @@ const LessonContent: React.FC<LessonContentProps> = ({ lesson }) => {
       </Button>
       
       <div className="mb-6">
-        <h1 className="text-3xl md:text-4xl font-cafe font-bold text-coffee-dark dark:text-coffee-light mb-2">
+        <h1 className="text-3xl md:text-4xl font-cafe font-bold text-blue-dark dark:text-blue-light mb-2">
           {lesson.title}
         </h1>
         <div className="flex items-center text-muted-foreground">
@@ -68,7 +67,7 @@ const LessonContent: React.FC<LessonContentProps> = ({ lesson }) => {
             <ul className="space-y-3">
               {lesson.content.keyPoints.map((point, index) => (
                 <li key={index} className="flex">
-                  <CheckCircle size={20} className="text-accent-teal mr-3 mt-1 flex-shrink-0" />
+                  <CheckCircle size={20} className="text-highlights-blue mr-3 mt-1 flex-shrink-0" />
                   <span>{point}</span>
                 </li>
               ))}
@@ -98,7 +97,7 @@ const LessonContent: React.FC<LessonContentProps> = ({ lesson }) => {
       
       {!isCompleted ? (
         <Button 
-          className="w-full md:w-auto bg-accent-teal hover:bg-accent-teal/90"
+          className="w-full md:w-auto bg-highlights-blue hover:bg-highlights-navy"
           size="lg"
           onClick={handleComplete}
         >
@@ -106,7 +105,7 @@ const LessonContent: React.FC<LessonContentProps> = ({ lesson }) => {
           Mark as Complete
         </Button>
       ) : (
-        <div className="bg-accent-teal/20 text-accent-teal p-4 rounded-lg flex items-center">
+        <div className="bg-highlights-blue/20 text-highlights-blue p-4 rounded-lg flex items-center">
           <CheckCircle size={20} className="mr-2" />
           Lesson completed! Returning to menu...
         </div>
