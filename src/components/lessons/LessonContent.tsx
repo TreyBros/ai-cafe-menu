@@ -84,7 +84,7 @@ const LessonContent: React.FC<LessonContentProps> = ({ lesson }) => {
           <p className="text-lg mb-8">{intro}</p>
           
           {/* Key learning points */}
-          {keyPoints.length > 0 && (
+          {keyPoints && keyPoints.length > 0 && (
             <div className="mb-8">
               <h3 className="text-xl font-cafe font-semibold mb-4">Key Points</h3>
               <ul className="space-y-3">
