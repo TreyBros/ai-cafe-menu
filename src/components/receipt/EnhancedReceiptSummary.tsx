@@ -281,7 +281,7 @@ const EnhancedReceiptSummary: React.FC = () => {
                                 {menuItem.description}
                               </div>
                               <div className="flex flex-wrap gap-1 mt-1">
-                                {menuItem.highlights.slice(0, 3).map((highlight, idx) => (
+                                {menuItem.highlights && menuItem.highlights.slice(0, 3).map((highlight, idx) => (
                                   <Badge key={idx} variant="secondary" className="bg-vsp-premium/5 text-vsp-premium text-xs border-vsp-premium/10">
                                     {highlight}
                                   </Badge>
@@ -423,7 +423,7 @@ const EnhancedReceiptSummary: React.FC = () => {
                             </div>
                             
                             <div className="flex flex-wrap gap-1 mb-2">
-                              {menuItem.highlights.slice(0, 3).map((highlight, idx) => (
+                              {menuItem.highlights && menuItem.highlights.slice(0, 3).map((highlight, idx) => (
                                 <Badge key={idx} variant="secondary" className="bg-vsp-blue/5 text-vsp-blue text-xs">
                                   {highlight}
                                 </Badge>
@@ -557,7 +557,7 @@ const EnhancedReceiptSummary: React.FC = () => {
                       <TableBody>
                         {session.completedItems.flatMap((itemId, index) => {
                           const menuItem = getItemDetails(itemId);
-                          if (!menuItem) return [];
+                          if (!menuItem || !menuItem.highlights) return [];
                           
                           return menuItem.highlights.map((skill, skillIndex) => (
                             <TableRow key={`${itemId}-${skillIndex}`}>
@@ -579,7 +579,7 @@ const EnhancedReceiptSummary: React.FC = () => {
                     
                     <div>
                       <h4 className="font-medium text-vsp-darkgray dark:text-white mb-2">Learning Notes</h4>
-                      {session.notes.length > 0 ? (
+                      {session.notes && session.notes.length > 0 ? (
                         <div className="space-y-3">
                           {session.notes.map((note, index) => (
                             <div key={index} className="p-3 bg-card rounded-lg border border-vsp-blue/10">
@@ -642,4 +642,4 @@ const EnhancedReceiptSummary: React.FC = () => {
   );
 };
 
-export default EnhancedReceiptSummary; 
+export default EnhancedReceiptSummary;

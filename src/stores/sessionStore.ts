@@ -1,3 +1,4 @@
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
@@ -5,9 +6,17 @@ import { v4 as uuidv4 } from 'uuid';
 interface MenuItem {
   id: string;
   title: string;
-  category: 'appetizer' | 'entree' | 'dessert';
+  category: string; // Changed from enum to string to include 'course' and 'workshop' types
   price: string;
   image?: string;
+  description?: string;
+  difficulty?: string;
+  duration?: string;
+  highlights?: string[];
+  content?: any;
+  proceedToLesson?: boolean;
+  featured?: boolean;
+  badges?: string[];
 }
 
 interface CoffeeItem {
@@ -15,37 +24,45 @@ interface CoffeeItem {
   name: string;
   price: string;
   image?: string;
+  description?: string;
+  flavorNotes?: string[];
 }
 
 interface OrderItem {
   id: string;
   menuItemId: string;
-  coffeeItemId?: string;
+  coffeeId?: string; // Make sure coffeeId exists
   completed: boolean;
   timestamp: string;
   notes?: string;
+}
+
+interface CompletedOrder {
+  date: string;
+  items: OrderItem[];
 }
 
 interface LearningSession {
   sessionId: string;
   userName?: string;
   startTime: string;
-  completedItems: MenuItem[];
+  completedItems: string[]; // Store only IDs, not full objects
   selectedCoffees: CoffeeItem[];
   currentOrder: OrderItem[];
-  completedOrders: OrderItem[];
+  completedOrders: CompletedOrder[]; // Updated to use CompletedOrder type
   userNotes: string[];
   skillsAcquired: string[];
   emailAddress?: string;
   totalTimeSpent: number; // in minutes
+  notes: string[]; // Added notes property
 }
 
 interface SessionStore {
   session: LearningSession;
-  addCompletedItem: (item: MenuItem) => void;
+  addCompletedItem: (itemId: string) => void; // Changed to accept ID instead of object
   addCoffeeToSelection: (coffee: CoffeeItem) => void;
   removeCoffeeFromSelection: (coffeeId: string) => void;
-  createOrder: (menuItemId: string, coffeeItemId?: string, notes?: string) => void;
+  createOrder: (menuItemId: string, coffeeId?: string, notes?: string) => void;
   completeOrderItem: (orderId: string) => void;
   addNote: (note: string) => void;
   addSkill: (skill: string) => void;
@@ -55,7 +72,7 @@ interface SessionStore {
   resetSession: () => void;
   getReceipt: () => any;
   getCurrentOrder: () => OrderItem[];
-  getCompletedOrders: () => OrderItem[];
+  getCompletedOrders: () => CompletedOrder[];
 }
 
 const createInitialSession = (): LearningSession => ({
@@ -68,6 +85,7 @@ const createInitialSession = (): LearningSession => ({
   userNotes: [],
   skillsAcquired: [],
   totalTimeSpent: 0,
+  notes: [], // Initialize notes property
 });
 
 export const useSessionStore = create<SessionStore>()(
@@ -75,11 +93,11 @@ export const useSessionStore = create<SessionStore>()(
     (set, get) => ({
       session: createInitialSession(),
       
-      addCompletedItem: (item) => 
+      addCompletedItem: (itemId) => 
         set((state) => ({
           session: {
             ...state.session,
-            completedItems: [...state.session.completedItems, item]
+            completedItems: [...state.session.completedItems, itemId]
           }
         })),
       
@@ -99,7 +117,7 @@ export const useSessionStore = create<SessionStore>()(
           }
         })),
         
-      createOrder: (menuItemId, coffeeItemId, notes) =>
+      createOrder: (menuItemId, coffeeId, notes) =>
         set((state) => ({
           session: {
             ...state.session,
@@ -108,7 +126,7 @@ export const useSessionStore = create<SessionStore>()(
               {
                 id: uuidv4(),
                 menuItemId,
-                coffeeItemId,
+                coffeeId,
                 completed: false,
                 timestamp: new Date().toISOString(),
                 notes
@@ -127,11 +145,17 @@ export const useSessionStore = create<SessionStore>()(
           // Mark as completed and move to completed orders
           const completedOrder = { ...orderItem, completed: true };
           
+          // Create a CompletedOrder object
+          const completedOrderEntry: CompletedOrder = {
+            date: new Date().toISOString(),
+            items: [completedOrder]
+          };
+          
           return {
             session: {
               ...state.session,
               currentOrder: state.session.currentOrder.filter(item => item.id !== orderId),
-              completedOrders: [...state.session.completedOrders, completedOrder]
+              completedOrders: [...state.session.completedOrders, completedOrderEntry]
             }
           };
         }),
@@ -140,7 +164,8 @@ export const useSessionStore = create<SessionStore>()(
         set((state) => ({
           session: {
             ...state.session,
-            userNotes: [...state.session.userNotes, note]
+            userNotes: [...state.session.userNotes, note],
+            notes: [...(state.session.notes || []), note] // Update both arrays for compatibility
           }
         })),
         
@@ -198,14 +223,11 @@ export const useSessionStore = create<SessionStore>()(
         
         // Calculate learning stats
         const categoriesCompleted = [
-          ...new Set((completedItems || []).map(item => item.category))
+          ...new Set(completedItems)
         ];
         
         // Calculate order total
-        const orderTotal = [
-          ...completedItems,
-          ...selectedCoffees
-        ].reduce((total, item) => {
+        const orderTotal = selectedCoffees.reduce((total, item) => {
           const price = (item.price || "$0.00").replace('$', '');
           return total + parseFloat(price);
         }, 0);
@@ -233,7 +255,9 @@ export const useSessionStore = create<SessionStore>()(
             total: (orderTotal * 1.08).toFixed(2),
             currency: "USD"
           },
-          emailAddress: session.emailAddress
+          emailAddress: session.emailAddress,
+          totalItems: completedItems.length,
+          totalAmount: orderTotal.toFixed(2),
         };
       }
     }),
